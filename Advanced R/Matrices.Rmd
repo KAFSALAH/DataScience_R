@@ -1,0 +1,41 @@
+---
+title: "Matrices"
+author: "Salah"
+date: "11/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown  (Matices)
+#Matrices Creation 
+#Matrices are vectors with a dimension attributes
+```{r}
+m <- matrix(nrow=2,ncol=3)
+print(m)
+```
+#Matrices are constructed column-wise
+```{r}
+m <- matrix(1:6, nrow = 2, ncol = 3)
+m
+```
+#Accessing a certain element
+```{r}
+m[1,2] #First row second column
+m[4] #Fourth elemnt
+m[1,] #First entire row
+```
+```{r}
+mdat <-
+matrix(c(1, 2, 3, 11, 12, 13),
+nrow = 2,ncol = 3, byrow = TRUE) #To create it row-wise
+mdat
+```
+```{r}
+rows = c("row1", "row2","row3", "row4") #Creating vector of row names
+cols = c("colm1", "colm2","colm3","Colm4") #Creating character vector of column names
+mat <- matrix(c(4:19),nrow=4, ncol=4, byrow=TRUE,dimnames=list(rows,cols))
+mat
+```
