@@ -1,0 +1,55 @@
+---
+title: "Lists"
+author: "Salah"
+date: "11/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Lists can contain different r objects, no coercion
+
+
+```{r}
+# C function is a vector, for example
+c("Bread", 1990,5)
+#Vs list function
+list("Bread",1990,5)
+
+
+```
+
+### Creating a list giving names.
+
+```{r}
+list_a <- list("Bread",1990,5)
+# checking 
+is.list(list_a)
+```
+
+```{r}
+# Assigning lables for the list,
+
+names(list_a) <- c("Kind","Year","Number")
+list_a
+```
+
+```{r}
+#Another method is as follows,
+
+list_b <- list(kind = "Bread", Year = 1990, Number = 5)
+list_b
+```
+```{r}
+str(list_a) #Knowng the type of the list 
+str(list_b) #Knowng the type of the list
+```
+#### It is possible to store a list in a list
+
+```{r}
+Combined_list <- list(list_a,list_b)
+str(Combined_list)
+```
+
