@@ -14,7 +14,6 @@ new.list <- list( age =17 ,    sex=   " Male ")
 updated.list <- list(my.list,new.list)
 class(updated.list)
 
-
 ```
 # Useing names(..) to modify the attribute names.
 ```{r}
