@@ -53,4 +53,60 @@ length(list)
 list <- list[-2]
 list
 ```
+### Creating a list
+```{r}
+x <- list(a = 2.5,b = TRUE, c = 1:3)
+class(x)
+typeof(x)
+str(x)
+```
+### Combining two lists 
+```{r}
+n <- c(2,3,5)
+s <- c("aa","bb","cc","dd")
+list <- list("First" = s,"Second" =n,"Third" = 3)
+list
+str(list) #Metadata about the list
+```
 
+```{r}
+#List slicing 
+list[2]
+list[c(1,3)]
+```
+```{r}
+list["First"] #Slicing by the name of vectors 
+```
+
+### Similar manner to vectors. Integer, logical or character vectors can be used for  indexing.
+
+### Indexing with [ as shown above will give us sublist not the content  inside the component. To retrieve the content, we need to use [[.
+
+```{r}
+list["First"] # Single [ returns a list
+list[["First"]] # Double [[ returns a vector
+typeof(list["First"] ) # List
+typeof(list[["First"]]) #Character
+```
+### We can use $ instead of [[]]
+```{r}
+list$First 
+list$Second
+typeof(list$First) #Character 
+class(list$First) #Character
+typeof(list$Second) #double 
+class(list$Second) #Numeric
+```
+### Further indexing can be accomplished also !
+```{r}
+list$First[2] 
+# Modification as follows,
+list$Second <- "New String insead of 2 3 5 Vector"
+list
+```
+### We can delete a component by assigning NULL to it.
+```{r}
+list[["First"]] <- NULL
+list
+str(list)
+```
