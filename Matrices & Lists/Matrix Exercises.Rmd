@@ -9,14 +9,14 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R summation
+#### R summation
 ```{r}
 mat1 <- matrix(1:8, nrow = 4, ncol = 4)
 mat2 <- matrix(data=1:16,nrow=4,ncol=4)
 sum <- mat1 +mat2
 sum
 ```
-#In the same manner for subtraction, divisoin, multiplication
+#### In the same manner for subtraction, divisoin, multiplication
 ```{r}
 diff <- mat1 - mat2
 div <- mat1/mat2
