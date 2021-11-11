@@ -1,0 +1,98 @@
+---
+title: "LP3_S21084371"
+author: "Salah"
+date: "11/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Practice Q1. Write an R program to count number of objects in a given list?
+
+```{r}
+list_data <-  list( c(" Red "," Green "," Black "),list(" Python ", " PHP ", " Java "))
+print(" List:")
+print(list_data)
+print("Number    of    objects    in    the    said    list:")
+lengths(list_data)[1] + lengths(list_data)[2]
+
+### Additional information can be extracted as bellow,
+str(list_data) #Metadata about the list (General information)
+length(list_data) # Count the number of elements in the list
+lengths(list_data) #Count the number of objects within the list elements
+
+```
+#### Practice Q2. Write an R program to assign NULL to a given list element?
+
+```{r}
+l   =    list(1 ,   2 ,   3 ,   4 ,   5)
+print(" Original    list:")
+print(l)
+print(" Set   2 nd    and   3 rd    elements    to    NULL ")
+l[c(2,3)] = list(NULL)
+print(l)
+```
+
+#### Practice Q3. Write an R program to Add 10 to each element of the first  vector in a given list? Sample list: (g1 = 1:10, g2 = ”R Programming”, g3 =  ”HTML”).
+
+```{r}
+list1    <-   list( g1   =   1:10 ,    g2   =   " R    Programming ",   g3 = " HTML ")
+print("Original    list:")
+print( list1 )
+print(" New    list:")
+s = rep(10,times =10)
+list1[[1]] <- list1[[1]]+s
+print(list1)
+```
+
+
+#### Practice Q4. Write an R program to extract all elements of a first vector  except the third element of it from a given list. Sample list:  (g1 = 1:10, g2 = ”R Programming”, g3 = ”HTML”).
+
+```{r}
+list1 = list( g1  = 1:10 , g2  = " R   Programming ", g3 =   " HTML ")
+print(" Original    list:")
+print( list1 )
+print(" First    vector:")
+list1[[1]][-3]
+
+```
+
+#### Practice Q5. Write an R program to add a new item g4 = ”Python” to a  given list. Sample list: (g1 = 1:10, g2 = ”R Programming”,  g3 = ”HTML”).
+
+```{r}
+list1 = list( g1  = 1:10 , g2  = " R   Programming ", g3 =   " HTML ")
+print(" Original    list:")
+print( list1 )
+print(" Add   a   new    vector    to    the    said    list:")
+list1$g4 = "Python"
+print(list1)
+```
+
+#### Practice Q6. Write an R program to get the length of the first two vectors of  a given list. Sample list: (g1 = 1:10, g2 = ”R Programming”,  g3 = ”HTML”).
+
+
+```{r}
+list1 = list( g1  = 1:10 , g2  = " R   Programming ", g3 =   " HTML ")
+print(" Original    list:")
+print( list1 )
+print(" Length    of    the    vector    g1    and    g2    of    the    said list")
+cat("Length of g1 is" , lengths(list1)[1] , "and length of g2 is" , lengths(list1)[2]) #Count the number of objects within the list elements
+
+```
+
+
+#### Practice Q7. Write an R program to find all elements of a given list that are  not in another given list? Hint, see setdiff(..).
+
+
+```{r}
+l1 = list ("x","y","z")
+l2 = list ("X","Y","Z","x","y","z")
+print("Original lists:")
+print(l1)
+print(l2)
+print("All elements of l2 that arenot in l1 :")
+setdiff(l2,l1)
+```
+
