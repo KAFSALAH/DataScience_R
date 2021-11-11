@@ -15,6 +15,31 @@ updated.list <- list(my.list,new.list)
 class(updated.list)
 
 ```
+
+```{r}
+my.list <-  list( stud.id =12456 , stud.name =" Ali", 
+stud.marks=c(56 ,65 ,68 ,78))
+my.list$stud.id
+my.list$stud.name
+my.list$stud.marks
+new.list <- list( age =17 ,    sex=   " Male ")
+updated.list <- list(my.list,new.list)
+class(updated.list)
+```
+# Useing names(..) to modify the attribute names.
+```{r}
+list    <-   list( ID =154 ,    NAME =" Nasser")
+names(list)
+names(list) <-  c(" Identification ", " First Name ")
+list
+```
+### Remove list members either by -ve or NULL
+```{r}
+length(list)
+list <- list[-2]
+list
+```
+
 # Useing names(..) to modify the attribute names.
 ```{r}
 list    <-   list( ID =154 ,    NAME =" Nasser")
