@@ -19,7 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 data.frame( foo = 1:4 , bar = c(T, T, F, F)) 
 ```
-
 #### A data frame is used for storing data tables. It is a list of vectors of equal length.
 ```{r}
 n = c(2 , 3, 5)
