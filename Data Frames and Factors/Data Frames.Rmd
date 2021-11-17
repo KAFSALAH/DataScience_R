@@ -1,0 +1,95 @@
+---
+title: "Data frames"
+author: "Salah"
+date: "11/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Data frame is a two dimensional data structure in R. It is a special case  of a list which has each component of equal length.
+#### Data frame is a tabular data in R
+#### Can store different classes of objects in each column
+#### Data frames have a special attribute called row.names which indicates information about each row of the data frame.
+#### Data frames can either by created by reading csv or tables file. read.table(..) or read.csv(..).
+#### Or created explicitly using the data frame function
+
+```{r}
+data.frame( foo = 1:4 , bar = c(T, T, F, F)) 
+```
+
+#### A data frame is used for storing data tables. It is a list of vectors of equal length.
+```{r}
+n = c(2 , 3, 5)
+s = c("aa", "bb", "cc") 
+b = c(TRUE, FALSE, TRUE) 
+df = data.frame(n, s, b)
+df
+
+```
+#### Another example is as bellow,
+
+```{r}
+x <- data.frame("SN" = 1:2, "Age" = c(21,15),"Names" = c("Mohammad","Ahmed"))
+x
+str(x)
+```
+#### Basic functions for data frames,
+```{r}
+names(x)
+nrow(x)
+ncol(x)
+length(x)
+```
+#### Accessing a column by its name
+```{r}
+x['Names'] 
+x$Names 
+class(x['Names']) #Column i.e., data frame
+class(x$Names) #Vector of characters 
+```
+#### Accessing A certain element 
+```{r}
+# Both of them are the same output as follows,
+x[["Names"]][2]
+x$Names[2]
+
+#Also,
+x[1,] #Complete first row [df]
+x[1:2,] #Complete first two rows [df]
+x[,2] #Second row as a vector "Numeric" class(x[,2])
+x[1,2] #first row second column value (Numeric) class(x[1,2])
+
+```
+#### To avoid creating x[,2] as a vector, we use the following code
+```{r}
+x1<- x[,2,drop = FALSE]
+x1
+class(x1)
+#x["Age"] #This is dataframe
+#x[["Age"]] #This is vector
+```
+#### Set new index names,
+```{r}
+row.names(x) <-c("stu1","stu2")
+x
+row.names(x) #Console output #Vector of characters
+```
+
+```{r}
+names(x)[names(x)=='SN'] <- 'SID' #Renaming a column
+x
+names(x) <-c("StdID","StdAge","StdName") #Renaming all columns
+x
+```
+#### Recap
+```{r}
+
+x[,3] #Character vector
+x[,3,drop=FALSE] #DF
+x["StdName"] #DF
+x[["StdName"]] #Character vector
+```
+
