@@ -1,0 +1,93 @@
+---
+title: "Data Frames Operations"
+author: "Salah"
+date: "11/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Creating a DF
+
+```{r}
+x <- data.frame("SN"=1:2, "Age"= c(21,25),"Name"= c("Mohammed","Nasser"))
+x
+```
+```{r}
+x[1,"Age"] <-20 #Changing the value of one element
+
+```
+### Rows can be added by rbind
+```{r}
+x = rbind(x,list(3,16,"Paul")) #Using list as the vector is not atomic
+```
+### Column-wise
+```{r}
+x = cbind(x,state=c("NY","FL","CA"))
+```
+
+```{r}
+x
+```
+
+#### Data frames are implemented as lists, thus, we can also add new columns through simple list-like assignments.
+
+```{r}
+x$income <- c("12K","14K","22K")
+x
+```
+
+#### Removing a component
+```{r}
+x["state"] <- NULL or x$state <- NULL
+```
+```{r}
+x
+```
+```{r}
+x <- x[,-4] #Removing the 4th column as x<- x[-1,] Removing first row
+x
+```
+```{r}
+y<- data.frame("SN"=1:2, "Age"= c(20,15), "Name" = c("Dona", "Steve"))
+y<-rbind(y, list(3,19,"Khalid"))
+y<-cbind(y, State= c("NY", "FL", "CA"))
+y[,c("Age","Name")] #Certain columns
+y[c(1,3),] #Certain rows
+y[c(1,3), c("Name", "Age")] #Certain rows & columns
+
+```
+
+```{r}
+y
+```
+```{r}
+y[y$Age >17,] #Row condition
+y[y$Name=="Dona",] #Row Condition
+y[y$Age==20,] #Row Condition
+y[y$Age >15, c("Name", "Age")] #Who is older than 15 (Row condition), list his/her name and age
+
+```
+```{r}
+str(y)
+summary(y)
+```
+
+```{r}
+class(mtcars)
+typeof(mtcars)
+head(mtcars)
+tail(mtcars)
+
+```
+```{r}
+m3<-(mtcars$mpg)
+typeof(m3)
+m4<-mtcars[2] #DF = [] is a data frame output
+m4<-mtcars[[2]] # [,] lists, [[also lists]]
+class(m4)
+```
+
+
