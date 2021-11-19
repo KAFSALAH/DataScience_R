@@ -1,0 +1,71 @@
+---
+title: "Factors"
+author: "Salah"
+date: "11/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# "Factor is a data structure used for fields that takes only predefined,  finite number of values (categorical data). E.g., a data fieldsuch as marital status may only contain values from single, married,  separated, divorced, or widowed."
+
+#Used to represent categorical data.
+
+#We can think of a factor as an integer vector where each  integer has a [label].
+
+#Factors are important in statistical modeling.
+
+#Using factors with labels is better than using integers becausefactors are self-describing.
+
+#Having a variable that has values “Male” and “Female” is better than  a variable that has values 1 and 2. Marital status may have values single, married, divorced or widowed.
+
+
+```
+
+```{r}
+x<-factor(c("single","married","married","single"))
+x #Two levels
+```
+```{r}
+#levels can predefined even if not being used
+x<-factor(c("single","married","married","single"),
+levels=c("single","married","divorced"));
+x
+str(x)
+```
+
+#### Levels are stored in a character vector
+####The individual  elements are actually stored as indices.
+
+```{r}
+x[-1] #access all but 1
+x[c(1,3)] #From 1 to 3
+x[c(TRUE,FALSE,FALSE,TRUE)] #Logic vector to find 
+```
+```{r}
+class(x) #Factor
+levels(x)
+```
+
+```{r}
+#Modify an element
+x[2]<-"divorced"
+x
+```
+
+```{r}
+x[3]<-"widowed" #cannot assign outside values  
+x #Warning in `[<-.factor`(`*tmp*`, 3, value = "widowed") :invalid factor level, NA generated
+
+```
+```{r}
+#To solve this, we add new level to x levels
+levels(x) <- c(levels(x),"widowed")
+levels(x)
+x[3] <- "widowed"
+x
+```
+
