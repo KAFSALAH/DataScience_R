@@ -1,0 +1,99 @@
+---
+title: "Amazon Web Scraping with R"
+author: "Salah"
+date: "11/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##### The scraped product is "Samsung DC-E Series Commercial LED Displays 32-Inch Screen LED-Lit Monitor (DC32E)" from Amazon India as it allows for price scraping.
+
+```{r}
+#the used Reference is "An introduction to web scraping using R"
+# Link "https://www.freecodecamp.org/news/an-introduction-to-web-scraping-using-r-40284110c848/"
+
+```
+
+#### Loading the necessary packages
+```{r}
+library(xml2) #Used in web scraping
+library(rvest) # "rvest is used in extracting the information we need from web pages."
+library(stringr) #Used in data cleaning
+```
+
+#### Creating url variable + Read html content of the url
+```{r}
+url = "https://www.amazon.in/Samsung-Commercial-Displays-32-Inch-DC32E/dp/B01BJOF46K/ref=sr_1_3?keywords=samsung+tv+screen&qid=1637409358&s=electronics&sr=1-3"
+webpage<- read_html(url)
+```
+
+#### Scrap the product details from the Amazon
+#### The scraped data is as follows,
+#### 1 - Title: The title of the product.
+#### 2 - Price: The price of the product.
+#### 3 - Description: The description of the product.
+#### 4 - Rating: The user rating of the product."
+
+
+```{r}
+#scrape title of the product
+title_html <- html_nodes(webpage, "h1#title")
+title <- html_text(title_html)
+head(title)
+```
+```{r}
+#Removing /n and spaces,
+title <- str_replace_all(title,"[\r\n]" , "")
+title
+```
+
+#### Extracting other related information
+#### A. Price
+```{r}
+#Price of the product
+price_html <- html_nodes(webpage,"span#priceblock_ourprice")
+price <- html_text(price_html)
+price <- str_replace_all(price, "[\r\n]" , "")
+price
+```
+#### B. Description
+```{r}
+desc_html <- html_nodes(webpage, "div#productDescription")
+desc <- html_text(desc_html)
+desc <- str_replace_all(desc, "[\r\n\t]" , "")
+desc <- str_trim(desc)
+head(desc)
+```
+
+#### C. Rating
+```{r}
+rate_html <- html_nodes(webpage, "span#acrPopover") 
+rate <- html_text(rate_html)
+rate <- str_replace_all(rate, "[\r\n]" , "")
+rate <- str_trim(rate)
+rate
+```
+#### Creating an R Data Frame
+
+```{r}
+#Creating a dataframe 
+DataFrame<- data.frame("Title" = title, "Price" = price,"Description" = desc, "Rating" = rate)
+DataFrame <- DataFrame[-2,] # Removing the dublicated row
+DataFrame #Showing the data frame 
+
+```
+
+#### Data Frame metadata
+```{r}
+#Data Frame metadata
+str(DataFrame)
+```
+
+#### Export to CSV file for further analysis
+```{r}
+write.csv(DataFrame,"/Users/salahkaf/Documents/Amazon_product.csv", row.names = FALSE)
+
+```
+
