@@ -1,0 +1,76 @@
+---
+title: "CodeBook Creation in R"
+author: "Salah"
+date: "11/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### This work is based on [Generate a simple codebook in R, https://www.adrianbruegger.com/post/simple-codebook/ ] accessed 21/11/2021.
+
+#### First import the important haven library and a dataset 
+
+```{r}
+library(haven) # package to read files from popular statistical software packages such as SPSS, SAS, Stata
+data <- read_sav("https://mmi.psycho.unibas.ch/r-toolbox/data/Cars.sav") # import data
+```
+
+#### Presenting the imported data (Data about cars)
+
+```{r}
+data
+```
+#### Showing the labels of variables using get_label and get_labels
+```{r}
+library(sjlabelled) # package to read and write item labels and values
+get_label(data) # show content of variables (what the variable measures)
+
+# which returns for example:
+# MPG               
+# "Miles per Gallon"
+
+get_labels(data) # show value labels (what the different answer options mean)
+# note: the value labels are not used for this very simple codebook.
+
+# which returns for example:
+# $CYLINDER
+# [1] "3 Cylinders" "4 Cylinders" "5 Cylinders" "6 Cylinders" "8 Cylinders"
+```
+
+#### Create a simple codebook based on the labels of the dataset
+```{r}
+# extract labels from dataframe and store as new object
+library(tibble)
+simple_codebook <- enframe(get_label(data))
+
+# use more informative column names
+colnames(simple_codebook) <- c("variable_id", "item_text")
+
+# Show the new data frame
+simple_codebook
+```
+
+#### Generating decriptive statistics. 
+```{r}
+# get descriptive statistics and select those of interest
+library(psych)
+library(dplyr)
+descriptives <- data %>% describe() %>% as_tibble() %>% select("n","min","max","mean")
+# add stats to codebook 
+simple_codebook <- cbind(simple_codebook,descriptives)
+```
+
+
+#### Saving the codebook in csv and xlsx file format. 
+
+```{r}
+# write to csv and Excel
+write.csv(simple_codebook,file="simple_codebook.csv", na="", row.names=FALSE) 
+
+library(openxlsx)
+write.xlsx(simple_codebook,file="simple_codebook.xlsx")
+```
+
