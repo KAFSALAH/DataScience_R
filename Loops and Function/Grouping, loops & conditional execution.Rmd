@@ -1,0 +1,226 @@
+---
+title: "Grouping, loops & conditional execution"
+author: "Salah"
+date: "11/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Grouped expressions:
+#####  "R is an expression language in the sense that its only command type is a function or expression which returns a result. Commands may be grouped together in braces, {expr 1, . . ., expr m}, in which case the value of the group is the result of the last expression in the group evaluated."
+
+#### Control Statement 
+##### "if statements –The language has available a conditional construction of the form if (expr 1) expr 2 else expr 3 where expr 1 must evaluate to a logical value and the result of the entire expression is then evident. a vectorized version of the if/else construct, the ifelse  function. This has the form ifelse(condition, a, b)"
+
+#### Repetitive execution as  For loops, repeat and while
+##### Branching is optional 
+##### R is not indent sensetive, but indent are preferably to do in conditions and {} is a must.
+
+```{r}
+voter <-T
+age <-10
+if (age <18) {
+  message("This is a minor")
+  voter <- F
+}
+message("If statement is completed")
+voter
+```
+
+```{r}
+voter <-T
+age <-20
+if (age <18) {
+  message("This is a minor")
+  voter <- F}
+
+message("If statement is completed")
+voter
+```
+##### Another concise way is as follows,
+```{r}
+age<-18
+if (age >=18) {
+  message("This is an adult")
+  voter <- T
+} else {
+  message("This is a minor")
+  voter <- F
+}
+voter
+```
+##### IFELSE statement quick assigment for a vector
+```{r}
+ages <- c(12,18,32,2,4)
+names(ages) <- c("Jane","Ed","Bob","Joe","Liz")
+voter <- ifelse(ages<18,'minor','voter') #minor is condition for IF, voter is condition for else
+voter
+```
+#If else example
+```{r}
+age <-20
+if (age <18) {
+  message("This is a minor")
+  voter <-F
+  driver<-F
+} else if (age <21) {
+  message("This is a voter")
+  voter <-T
+  driver<-F
+} else {
+  message("This is an adult")
+  voter <-T
+  driver<-T
+}
+voter
+driver
+
+```
+
+#### switch command works as ifelse
+```{r}
+dish <- "fruit"
+switch(dish, fruit ="banana",vegetable ="broccoli", meat="chicken") #Which option did the customer choose? it is fruit!
+#In the same manner, here we go with order number 3!
+x<-switch(3,'first','second','third','fourth')
+x
+```
+
+#### Loops: "When the same or similar tasks need to be performed multiple times; for all elements of a list; for all columns of an array; etc."
+
+```{r}
+for (i in 1:10) {
+  print(i*i)
+}
+```
+#### Another example,
+```{r}
+i = 1
+while (i<=10) {
+  print (i*i)
+  i= i+1
+}
+```
+
+##### " For loops repeat the same task for changing values of a given variable."
+
+```{r}
+ages <-c(12,18,32,2,4)
+names(ages) <- c("Jane","Ed","Bob","Joe","Liz")
+for (person in names(ages)) {
+  message(person, " is ", ages[person], " years old")
+}
+```
+
+```{r}
+agesSum <-0
+ages<-c(12,18,32,2,4)
+names(ages) <-c('Jane','Ed','Bob','Joe','Liz')
+for (person in names(ages))
+{
+  message(person, ' is ', ages[person], ' years old.')
+  agesSum <-agesSum+ages[person]
+}
+agesSum
+```
+
+#### Nested loop # A loop inside a loop
+
+```{r}
+ages<-c(12,18,32,2,4)
+names(ages) <-c('Jane','Ed','Bob','Joe','Liz')
+for (person in names(ages)) {
+  message(person)
+  for(i in 1:ages[person])
+  {
+    message("Year",i)
+  }
+}
+  
+```
+#### Adding if statement in for loops
+```{r}
+ages <- c(12,18,32,2,4)
+numVoters <-0
+names(ages) <-c('Jane','Ed','Bob','Joe','Liz')
+for(person in names(ages))
+{
+  if (ages[person]>=18)
+  {
+    message(person," can vote")
+    numVoters <- numVoters+1
+  }
+}
+numVoters
+```
+#### Setting values with embedded if statement in for loops
+
+```{r}
+ages <- c(12,18,32,2,4,40)
+numVoters <-0
+names(ages) <-c('Jane','Ed','Bob','Joe','Liz','steve')
+voters <-vector()
+for (person in names(ages))
+{
+  if (ages[person]>=18)
+  {
+    message(person, "can vote")
+    numVoters <-numVoters +1
+    voters[numVoters] <- person #numVoters is the index for voters vector
+  }
+}
+numVoters
+voters
+```
+
+#### While loop
+##### while loops repeat the same operation until a test condition is met.
+
+```{r}
+
+z <-0
+while(z<5)
+{
+  z<- z+1
+  message(z)
+}
+```
+
+#### Repeat loop and break statement
+##### "A break statement is used inside a loop (repeat, for, while) to stop the iterations and flow the control outside of the loop."
+
+```{r}
+x <- 1
+repeat {
+  print(x)
+  x = x+1
+  if (x==6){
+    break
+  }
+}
+```
+
+
+```{r}
+x <- 1:5
+for (val in x) {
+  if (val==3) {
+    break #Stop at 3
+}
+print(val)
+}
+```
+
+```{r}
+x <- 1:5
+for (val in x) {
+  if (val==3) {
+    next #skip 3
+}
+print(val)
+}
+```
+
