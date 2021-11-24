@@ -1,0 +1,109 @@
+---
+title: "Subsetting"
+author: "Salah"
+date: "11/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### subsetting is selecting (and keeping) or deleting (dropping) variables and observations, or to take random samples from a dataset.
+
+```{r}
+
+#regular subsetting 
+
+x<- data.frame("SN"=1:4,
+          "Age"=c(21,20,25,27),
+          "Name"=c("John","Dora","Mary","Jim"), "Height" = c(162,157,155,129), "Gender" = c("M","F","F","M"))
+x[c("Age","Name")] #include age and name
+x[c(-2,-3)] #Removing second and third row
+```
+```{r}
+x$SN <- x$Age <- NULL #delete rows permanently
+```
+
+```{r}
+x
+```
+
+```{r}
+hsb2.small <- read.csv("https://stats.idre.ucla.edu/stat/data/hsb2_small.csv")
+```
+
+```{r}
+names(hsb2.small) #Reading the columns names
+```
+
+```{r}
+# Regular subsetting
+hsb3 <- hsb2.small[,c(1,7,8)] #Selecting specific columns
+hsb3
+```
+```{r}
+hsb4 <- hsb2.small[, 1:4] #colon notation
+hsb4
+```
+```{r}
+hsb6 <- hsb2.small[hsb2.small$ses==1,] # selecting the rows where ses =1 
+hsb6
+```
+```{r}
+hsb7 <-hsb2.small[hsb2.small$id %in% c(12, 48, 86, 11, 20, 195),] #The condition here is id value must exist in the instructed vector %in%
+hsb7
+```
+```{r}
+hsb8 <- hsb2.small[hsb2.small$ses==3 & hsb2.small$female==0,]
+hsb8
+#Another way is using with to not repeat hsb2.small
+hsb8b <- hsb2.small[with(hsb2.small,ses==3,female==0),]
+if (hsb8==hsb8b) {
+  print("Match!")
+}
+```
+#### Subsetting is an easier way to select variables and observations.
+#Subsetting using subset function as below,
+
+
+```{r}
+
+mydata<- data.frame("SN"=1:4,
+          "Age"=c(21,20,25,27),
+          "Name"=c("John","Dora","Mary","Jim"), "Height" = c(162,157,155,129), "Gender" = c("M","F","F","M"))
+mydata
+```
+
+
+```{r}
+# selecting the original set, then the conditions, and which columns
+newdata <- subset(mydata, Age>22 | Age <20,select=c(SN,Name))
+newdata
+```
+```{r}
+#Another example of subsetting
+newdata2 <- subset(mydata,Gender =="M" & Age > 25, select= SN:Height) #Select from column SN to Height column
+newdata2
+```
+
+#### The subset function with a logical statement will let you subset the data frame by observations. 
+
+```{r}
+names(hsb2.small)
+hsb2.small
+write.50 <- subset(hsb2.small, write > 50)
+write.50
+write.1 <- subset(hsb2.small,write>50 & read >60)
+write.1
+```
+#### Subsetting rows and columns together
+```{r}
+write.2 <- subset(hsb2.small,write>50 & read>60, select=c(write,read))
+write.2
+
+#In the data frame write.3 contains only the observations in variables read through science for which the values in the variable science are less than 55.
+write.3 <- subset(hsb2.small, science < 55, select = read:science)
+write.3
+```
+
