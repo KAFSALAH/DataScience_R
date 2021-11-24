@@ -1,0 +1,111 @@
+---
+title: "Apply Family"
+author: "Salah"
+date: "11/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Apply are functions to manipulate slices of data from matrices, arrays, lists and dataframes in a repetitive way.
+
+#### Apply() is the base function. 
+#### It takes three arguments 1 - data matrix/data frame. 2 - row/column operation. 3- function to be applied on the data
+
+
+```{r}
+apply(mtcars,2,mean) # apply the function ‘mean’ to the matrix mtcars along margin 2 (by column), summing up the values of each column
+```
+#### Another example of apply()
+```{r}
+#Creating a DF
+mat <- matrix(1:24,,ncol=4,nrow=6)
+df <- data.frame(mat)
+df
+```
+```{r}
+apply(df,1,sum) # Sum row-wise
+apply(df,2,sum) # Sum column wise
+class(apply(df,1,sum)) #integer
+class(apply(df,2,sum)) #integer
+```
+
+#### sapply, Like apply, it transverse over a set of data (list or vector) and call the function for EACH item.
+#### sapply for lists and vectors.
+#### sapply format [sapply(list,function)]
+ 
+```{r}
+mylist <- list("Arther","Dexter","John")
+sapply(mylist,toupper) # apply on all list elements
+```
+
+#### Another example for sapply
+```{r}
+fct = function(x) {
+  return(c(x,x*x,x*x*x))
+}
+sapply(1:5,fct)
+```
+
+####sapply works on list too
+
+```{r}
+l<- list(a=1:10, b=11:20)
+sapply(l,mean) #find the mean of each element in the list
+class(sapply(l,mean)) #numeric
+```
+
+#### lapply
+#### The difference between lapply() and apply() lies between the output return. The output of lapply() is a list. 
+
+#### It works on list, dataframes. And produces lists
+
+#### lapply() can be used for other objects like data frames and lists.
+
+#### lapply function in R, returns a list of the same length as input list object, each element of which is the result of applying FUN to the corresponding element of list
+
+```{r}
+lapply(l,mean) 
+class(lapply(l,mean)) #list
+```
+
+####tapply
+#### tapply() is a very powerful function that lets you break a vector into pieces and then apply some function to each of the pieces. In the below code, first each of mpg in mtcars data is grouped by cylinder type and then mean() function is calculated.
+
+```{r}
+mtcars
+tapply(mtcars$mpg,mtcars$cyl,mean)
+#MPG grouped by CYL, then the mean is found
+
+```
+
+```{r}
+#Another example ot tapply
+x<- data.frame("SN"=1:4,
+          "Age"=c(21,20,25,27),
+          "Name"=c("John","Dora","Mary","Jim"), "Height" = c(162,157,155,129), "Gender" = c("M","F","F","M"))
+x
+tapply(x$Height,x$Gender,sum) #Height grouped by gender summation
+tapply(x$Height,x$Gender,mean) #Height grouped by gender mean
+```
+#### mapply
+#### mapply stands for ‘multivariate’ apply. Its purpose is to be able to vectorize arguments to a function that is not usually accepting vectors as arguments.
+#### In short, mapply applies a Function to Multiple List or multiple Vector Arguments.
+
+```{r}
+weight <- list(females=c(55,61,52,48),
+              males=c(78,91,83,102))
+
+height <- list(females=c(1.65,1.63,1.77,1.54),
+               males = c(1.83,1.9,1.77,1.85))
+
+calcBMI <- function(kg,m) {kg/m^2}
+
+#Mapply compines between functions and lists 
+
+ans <- mapply(kg=weight,m=height,FUN=calcBMI)
+ans
+```
+
