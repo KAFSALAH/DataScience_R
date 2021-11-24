@@ -1,0 +1,98 @@
+---
+title: "Data Frames Manipulation"
+author: "Salah"
+date: "11/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.	Read file marks1.csv
+
+```{r}
+marks_df <- read.csv(file ='/Users/salahkaf/Downloads/marks1.csv')
+marks_df
+```
+# 2.	Check the data frame info using a few available functions
+
+```{r}
+head(marks_df) #Top 6 rows
+tail(marks_df) #last 6 rows
+dim(marks_df) #Dimensions of DF
+str(marks_df) #Structure of DF
+summary(marks_df) #Summary of Df
+```
+
+
+# 3.	Check the names of the variables in the data frame
+
+```{r}
+colnames(marks_df) #Attributes names
+```
+
+# 4.	Rename the first variable X to ID
+```{r}
+colnames(marks_df)[1] <- "ID"
+marks_df
+```
+# 5.	Rename the second variable X.1 to StuName
+```{r}
+colnames(marks_df)[2] <- "StuName"
+marks_df
+```
+#6.	Remove the first two column from the data frame
+
+```{r}
+# First let us make a backup DF 
+backup_df <- marks_df
+# Removing column 1 & 2 
+marks_df[,c(1,2)] <- NULL
+marks_df
+```
+
+# 7.	Use apply() function to sum all the marks in the data frame and put them in a new vector called Total and bind the vector to the data frame
+
+```{r}
+Total <- apply(marks_df,1,sum)
+Total
+```
+
+```{r}
+marks_df$Total = Total
+marks_df
+```
+# 8.	Using a user defined function called function(), use the apply() function to add variable 1 to variable 3, and write to a new variable in the data frame called CW. 
+
+```{r}
+cw_function <- function(x) {
+  x[1]+x[2]+x[3]
+}
+cw <- cw_function(marks_df)
+colnames(cw) <- "CW"
+cw
+```
+```{r}
+marks_df["CW"] <-cw
+marks_df
+```
+# We stil need to restore the first two columns, i.e., ID and stuName from the backup_df
+```{r}
+ID <- backup_df[,1]
+stuName <- backup_df[,2]
+marks_df["ID"] = ID
+marks_df["stuName"] = stuName
+#Reordering the DF to ma
+marks_df
+```
+# Relocating ID and stuName columns to the beginning 
+```{r}
+require(dplyr)
+marks_df <- marks_df %>% relocate (ID, stuName,.before= test)
+```
+#Final DF
+```{r}
+marks_df
+```
+
