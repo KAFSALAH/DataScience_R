@@ -1,0 +1,150 @@
+---
+title: "Tutorial 5 - EDA"
+author: "Salah"
+date: "12/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### attitude is the chosen dataset for this EDA
+
+```{r}
+attitude
+```
+
+#### 1.	See basic descriptive statistics
+
+```{r}
+dim(attitude) #Dimensions of Dataframe
+str(attitude) #Structure of Dataframe
+summary(attitude) #Summary of Dataframe
+```
+
+#### 1 - a)	What is the difference between (attitude[3]) and (attitude$learning)
+
+#### Ans. 
+#### Below, we observe that attitude[3] results a dataframe consists of one column. On the other hand attitude$learning produces a numeric vector
+
+```{r}
+attitude[3]
+attitude$learning
+class(attitude[3])
+class(attitude$learning)
+
+```
+
+#### 2.	Lists name of variables in a dataset
+
+```{r}
+colnames(attitude)
+```
+
+#### 3.	Calculate number of rows in a dataset
+
+```{r}
+nrow(attitude)
+```
+
+#### 4.	Calculate number of columns in a dataset
+
+```{r}
+ncol(attitude)
+```
+
+#### 5.	List structure of a dataset
+
+```{r}
+str(attitude)
+```
+
+#### 6.	See first 6 rows (by default) of dataset
+
+```{r}
+head(attitude)
+```
+
+#### 7.	See first n rows of dataset. Select to see the first 15 rows of dataset
+
+```{r}
+head(attitude,15)
+```
+#### 8.	See all rows but the last row
+
+```{r}
+head(attitude,nrow(attitude)-1)
+```
+
+
+#### 9.	See last 6 rows (by default) of a dataset
+
+```{r}
+tail(attitude)
+```
+
+
+#### 10.	See last n rows of dataset. Select to see the last 12 rows of dataset.
+
+```{r}
+tail(attitude,12)
+```
+#### 11.	See the last n rows but the first row
+
+```{r}
+tail(attitude,nrow(attitude)-1) # See all rows but first row
+```
+
+#### 12.	Number of missing values. Which function will return number of missing values in each variable of a dataset?
+
+```{r}
+is.na(attitude)
+cat("The total number of missing values in the dataset is" , sum(is.na(attitude)))
+```
+
+#### 13.	Number of missing values in a single variable
+
+```{r}
+for (i in 1:ncol(attitude)) {
+x <- sum(is.na(attitude[i]))
+cat("Number of missing values in col ", i, " = ", x, "\n")
+}
+
+```
+
+#### 14.	Plot a simple graph, which will appear on a screen device.
+
+```{r}
+plot(attitude) #Using only the basic command
+```
+
+
+#### 15.	Plot the graph shown below, and make it appear on a file device (a pdf file)
+
+```{r}
+plot(x = attitude$privileges,
+     y = attitude$learning,
+     xlab = "Privileges",
+     ylab = "Learning",
+     main=  "Learning Attitude",
+     xlim = c(30,85),
+     ylim = c(40,75))
+
+```
+
+#### Saving the plot as PDF on my disktop 
+```{r}
+pdf(file = "/Users/salahkaf/Desktop/My Plot.pdf",   # The directory to save the plot
+    width = 8, # The width of the plot in inches
+    height = 8) # The height of the plot in inches
+plot(x = attitude$privileges,
+     y = attitude$learning,
+     xlab = "Privileges",
+     ylab = "Learning",
+     main=  "Learning Attitude",
+     xlim = c(30,85),
+     ylim = c(40,75))
+dev.off()
+```
+
