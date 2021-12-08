@@ -1,0 +1,239 @@
+---
+title: "Dplyr"
+author: "Salah"
+date: "12/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Subsetting with base R is achived via index or names.
+# Subsetting wihch() and with()
+
+```{r}
+ # All columns, rows only cyl = 8
+mtcars[mtcars$cyl==8,]
+mtcars[which(mtcars$cyl==8),]
+mtcars[with(mtcars,cyl==8),]
+# All of them are data frames
+```
+
+```{r}
+#Row condition cyl = 8, column number 1 
+mtcars[mtcars$cyl == 8, 1]
+mtcars[which(mtcars$cyl == 8), 1]
+mtcars[with(mtcars, cyl == 8), 1]
+#Class numeric
+```
+
+```{r}
+#Row condition cyl = 8, column number 1:3
+mtcars[mtcars$cyl == 8, 1:3]
+mtcars[which(mtcars$cyl == 8), 1:3]
+mtcars[with(mtcars, cyl == 8), 1:3]
+#class data frames
+
+```
+
+# More specific subsetting
+```{r}
+#Two row condition cyl=8 and gear =3 
+mtcars[mtcars$cyl==8 & mtcars$gear>3,1:3]
+mtcars[which(mtcars$cyl==8 & mtcars$gear>3),1:3]
+mtcars[with(mtcars,cyl==8 & gear>3),1:3]
+```
+
+#Subsetting using subset (Row condition)
+
+```{r}
+#If columns are not specified, it will take all by default
+subset(mtcars,cyl==8)
+subset(mtcars,cyl==8 & gear ==5)
+subset(mtcars,cyl==8 & gear < 5)
+
+#Specifying the columns 
+subset (mtcars, cyl == 8, select= c(1:3))
+subset (mtcars, cyl == 8, select= c(1:3, 7))
+
+```
+
+```{r}
+#Adding select within subset provides column condition
+#Subset it based on row conditions
+subset (mtcars, cyl == 8 & gear< 5, select = c(1:3, 10))
+subset(mtcars,cyl==8 &gear <5, select=mpg:disp) #From column mpg to disp
+```
+
+
+# Dplyr family functions
+
+# glimpse function
+# "One handy feature with dplyr is the glimpse(..) function. This is  an improvement over str(..)."
+# "Use glimpse(..) to see the structure of the dataset and  decide  what manipulation is required."
+
+```{r}
+library(dplyr)
+glimpse(mtcars)
+```
+
+# sum () counts the observations in a column in the dataframe
+```{r}
+sum(mtcars$cyl==8) #Number of cars which have 8 cyl in the data frame
+sum(mtcars$gear>4) #Number of cars which have a gear > 4 
+```
+
+# In dplyr package, 
+# select() picks variables based on their names.
+# mutate() adds new variables that are functions of existing variables
+# filter() picks cases based on their values.
+# arrange() changes the ordering of the rows.
+# summarise() reduces multiple values down to a single summary. 
+# Pipeline
+
+```{r}
+select(mtcars,1:3)
+select(mtcars,-7) #All but 7th column
+select(mtcars,cyl:wt)
+select(mtcars, cyl:wt, -hp)
+select(mtcars, 1:4, -3)
+```
+# Via helper functions in select, we can even be more specific in our indexing as bellow,
+```{r}
+select (mtcars, starts_with("c"))
+select (mtcars, starts_with("c"),   ends_with("t"))
+select (mtcars, matches("car"),matches("dra"))
+
+# Dplyr has helper functions to help select a group of variables inside a select()
+# starts_with(“x”) 	every name that starts with “x”
+# ends_with(“x”)	every name that ends with “x”
+# contains(“x”)	every name that contains “x”
+# matches(“x”)	every name that matches “x”, where “x” can be a regular expression
+# num_range(“x”, 1:5)	the variable named x01, x02, x03, x04, x05
+# one_of(x)		every name that appears in x, which should be a character vector
+# 
+# Note : when referring to variables directly inside select(), don’t use quotes “”. When using helper function, use quotes
+
+```
+
+# Mutate() adds new column based on previous ones
+```{r}
+mutate(mtcars,hpp=hp/100)
+# Creates new column and add to a copy of the dataset
+# Syntax   
+# mutate(df, z=x+y)
+# Can add multiple variables
+# Can also use the newly created variable
+# mutate(df, z=x+y, zz = z+v)
+
+```
+
+# The filter(..) works exactly like select(), + you pass the data  frame first and then a condition separated by a comma
+
+```{r}
+filter(mtcars,cyl==8, qsec>16)
+filter(mtcars,cyl==8 & qsec>16)
+
+#Checking the number of rows using sum 
+
+filter(mtcars,cyl==8,qsec>16) #10 rows
+sum(mtcars$cyl==8 & mtcars$qsec >16) #10 rows
+filter(mtcars,(cyl==8 | cyl==6) & qsec >16) #16 rows
+sum( (mtcars$cyl==8 |mtcars$cyl==6) & mtcars$qsec>16) #16 rows
+```
+
+# Filter() Can use logical operators inside filter()
+# < , <= , == , != , >= , >
+# %in%
+
+
+```{r}
+filter(mtcars,cyl %in% c(4,8)) #No. of cyl exist in the vector (4,8)
+filter(mtcars,is.na(x)) # is.na()	for observations x where the value is NA
+
+```
+
+#Arrange ()
+
+```{r}
+arrange(mtcars,cyl) #based on number cyl
+arrange(mtcars, cyl, mpg) #Cyl first, then mpg
+arrange(mtcars,cyl,desc(mpg))
+```
+
+#Arranging a filtered data set
+```{r}
+arrange(filter(mtcars,(cyl==8 | cyl ==6) & qsec > 16), desc(cyl))
+```
+# Arranging a filtered and selected df
+
+```{r}
+arrange(filter(select(mtcars,mpg:vs,-disp,-drat),(cyl==8 | cyl ==6) & qsec >16), desc(cyl))
+```
+# "summarise() creates a new data frame. It will have one (or more) rows for each combination of grouping variables; if there are no grouping variables, the output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified."
+
+```{r}
+summarise(mtcars, min_mpg=min(mpg))
+summarise(mtcars, maximum_mpg=max(mpg),min_mpg=min(mpg))
+summarise(mtcars, mean = mean(mpg), n = n())
+```
+
+# "In summarise(), we can use any aggregating function that can take a vector of data and return a single number including "min(), max(), mean(), median(), quantile(), sd(), var()""
+
+```{r}
+summarise(filter(mtcars, cyl ==8), min_mpg = min(mpg), max_mpg = max(mpg), sd = sd(mpg), var = var(mpg))
+```
+# The dplyr library comes with a practical operator, %>%, called the  pipeline.
+# The pipeline feature makes the manipulation clean, fast and less  prompt to error.
+# define  the data frame used at the beginning and all the process will flow  from it.
+
+```{r}
+#Original Code,
+
+arrange(filter(select (mtcars, mpg:vs, -disp, -drat), (cyl == 8 | cyl == 6) & qsec >16), desc(cyl))
+#Pipeline below,
+
+newmtpipe <- mtcars %>%
+  select(mpg:vs,-disp,-drat) %>%
+  filter((cyl==8 | cyl ==6) & qsec >16) %>%
+  arrange(desc(cyl))
+newmtpipe
+```
+#Another example of pipeline
+
+```{r}
+#Original code,
+summarise(filter(mtcars,cyl==8), min_mpg=min(mpg), max_mpg = max(mpg))
+#Pipeline
+sumpipe <- mtcars %>%
+  filter(cyl==8) %>%
+  summarise(min_mpg = min(mpg), max_mpg=max(mpg))
+sumpipe
+```
+
+# Exercise
+## Load the iris dataset
+```{r}
+iris
+```
+## Select the first three columns of the iris dataset using  their column names. HINT:Use select().
+
+```{r}
+select(iris,Sepal.Length,Sepal.Width,Petal.Length)
+```
+## Select all the columns of the iris dataset except "Petal Width". HINT: Use -.
+```{r}
+select(iris,-Petal.Width)
+```
+## Filter the rows of the iris dataset for Sepal.Length >=  4.6 and Petal.Width >= 0.5.
+
+```{r}
+filter(iris, Sepal.Length >= 4.6 & Petal.Width >= 0.5)
+```
+## Create a new column called proportion, which is the ratio of Sepal.Length to Sepal.Width. HINT: Use mutate().
+
+```{r}
+mutate(iris, proportion = Sepal.Length/Sepal.Width)
+```
+
