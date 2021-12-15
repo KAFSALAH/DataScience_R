@@ -1,0 +1,186 @@
+---
+title: "TIDYR"
+author: "Salah"
+date: "12/8/2021"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### "Whenever working with rectangular data structures — data consisting of multiple cases (rows) and variables (columns) — our first step (in a tidyverse context) is to create or transform the data into a tibble. A tibble is a rectangular data table and a modern and simpler version of the data.frame construct in R."
+
+```{r}
+library(tidyverse)
+```
+
+#### "Whereas data frames were present in base R in the 1990s (and a part of the S programming language on which R is based), tibbles first appeared in the dplyr package and in the form of an R package tibble (v1.0) in 2016. Nevertheless, tibbles essentially are simpler data frames. In contrast to the base R behavior of data frames, turning data into tibbles is more restrictive. Specifically,"
+#### "tibbles do not change the types of input variables (e.g., strings are not converted to factors);"
+#### "tibbles do not change the names of input variables and do not use row names."
+#### "Tibbles are quite flexible in also allowing for non-syntactic variable (column) names. For instance, in contrast to data frames, the variable names in tibbles can start with a number or contain spaces"
+
+
+```{r}
+mtc <- as_tibble(mtcars)
+class(mtc)
+mtc
+```
+
+# TIDYR FAMILY 
+
+### gather() collapse multiple columns into two columns
+### takes multiple columns, and gathers them into key-value pairs
+### Convert wide to long data
+### gather(df, key, value, column)
+
+```{r}
+# Creating a messy df
+messy_df <- data.frame(name=c('Wilbur','Petunia','Gregory'),
+                       a=c(67,80,64),
+                       b=c(56,90,50))
+messy_df
+```
+# Applying Gather
+```{r}
+## gather(df, key, value, column) #Key takes the columns names # Value take the numbers in rows 
+tidy_df <- gather(messy_df,drug,heartrate,2:3)
+tidy_df
+```
+## Spread() converts long data to wide
+## takes two columns (key&value) and spreads into multiple columns
+# The opposite of gather
+
+```{r}
+messy_df1 <- spread(tidy_df,drug,heartrate)
+messy_df1
+# In other words spread is the opposite of gather
+```
+
+## Another spread example 
+
+```{r}
+original_df <- data.frame(
+country=c("Afghanistan","Afghanistan","Afghanistan","Afghanistan","Brazil","Brazil","Brazil","Brazil"),
+year = c(1999,1999,2000,2000,1999,1999,2000,2000),
+key =c("cases","population","cases","population","cases","population","cases","population"),
+value =c(745,19987071,2666,20595360,37737,172006362,80488,174504898))
+original_df
+
+```
+
+```{r}
+spread_original_df <- spread(original_df,key,value)
+#Keys become columns, in other words, variables in one column goes into columns
+#Values are spreaded over rows
+spread_original_df
+```
+
+## Another example of spread
+```{r}
+row <- c(1,1,1,51,51,51)
+vat <- c('Sepal.Length','Species','Species_num','Sepal.Length','Species','Species_num')
+value <- c(5.1,'setosa',1,7,'versicolor',2)
+df <- data.frame(row,vat,value)
+df
+```
+```{r}
+spread_df <- spread(df,vat,value)
+spread_df
+```
+
+```{r}
+city <- c("New York","New York","London","London","Beijing","Beijing")
+size <- c("large","Small","large","Small","large","Small")
+amount <- c(23,14,22,16,121,56)
+df <- data.frame(city,size,amount)
+df
+```
+
+```{r}
+spread_df <- spread(df,size,amount)
+spread_df
+```
+
+## Separate()
+## Multiple variables are stored in one column are then separated into multiple columns
+## Separete(df,data,colname)
+
+```{r}
+# Creating a messydf
+messydf <- data.frame(
+  name = c('Jake','Alice','Tim','Denise'),
+  sex_age = c("M.34",'F.55','M.76','F.19'),
+  eye_color = c("Other",'Blue','Brown','Other'),
+  Height = c('6\'1"','5\'9"','5\'7"','5\'1"'))
+messydf
+```
+
+## Applying separation
+
+```{r}
+tidydf <- separate(messydf,2,c("sex","age"))
+tidydf
+```
+
+## Another example of separation
+
+```{r}
+  x <- c(NA,'a.b','a.d','b.c')
+  y <- c(12,12,13,14)
+  df <- data.frame(x,y)
+  df
+```
+
+```{r}
+separate(df,x,c("colA","colB"))
+```
+
+## Unite()
+## To join variables
+## unite(df, newcol, original_columns)
+```{r}
+head(mtcars)
+```
+
+```{r}
+unitedmtcars<- unite_(mtcars,"vs_am",c("vs","am"))
+head(unitedmtcars)
+```
+
+#example of messy data handling
+
+```{r}
+id <- 1:4
+trt <- c("treatment","control","treatment","control")
+work.T1 <-c(0.0851,0.2254,0.2745,0.2723)
+home.T1 <-c(0.6158,0.4296,0.6516,0.5677)
+work.T2 <-c(0.1135,0.5959,0.3580,0.4288)
+home.T2 <-c(0.5190,0.2641,0.3987,0.8361)
+messy <- data.frame(id,trt,work.T1,home.T1, work.T2,home.T2)
+messy
+```
+
+#tidier below but still messy
+
+```{r}
+tidier <- gather(messy,key,time,3:6)
+tidier
+```
+## Work.T shoulb be separate two columns, one is for location, and one is for time
+
+```{r}
+# tidy <- separate(tidier,key,c("Location","Time"))
+# tidy
+tidy <- tidier %>%
+  separate(key,into=c("Location","Time"),sep="\\.")
+tidy
+```
+
+## tidy data can still be cleaned. Time column has two values that can be made into 2 variables, T1 and T2
+
+```{r}
+even_tidier <- tidy %>%
+  spread(Time,time)
+even_tidier
+```
+
