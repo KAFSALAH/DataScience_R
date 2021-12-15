@@ -1,0 +1,58 @@
+---
+title: "Additional libraries"
+author: "Salah"
+date: "12/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### lubridate is a package working with time 
+```{r}
+library(lubridate)
+```
+```{r}
+ymd("2015-08-25") #Year, Month, Day
+mdy("08-25-2015") #Month Day Year
+ymd("2015, August 25")
+myd("Sep, 1994 2")
+ydm("2011/23/1")
+hms("13:22:21")
+hms("13-22-21")
+ymd_hms("2015-08-25 13-33-09")
+```
+#### stringr is a package working with strings
+```{r}
+library(stringr)
+#Trim leading and trailing white space
+str_trim("       This is a test        ")
+#Pad string with zeros
+str_pad("24493", width=7, side = "left", pad = "0")
+#Create a character vector of names
+friends <- c("Sarah","Tom","Alice")
+#Search for a string in a vector
+str_detect(friends,"Alice")
+#Replace string in vector
+str_replace(friends,"Alice","David")
+states <- c("al","ak")
+states_upper <- toupper(states) # tolower for lower case
+
+```
+
+#Creating a simple DF
+```{r}
+ID <- 1:4
+Gender <- c('M','F','F','M')
+Names <- c("Tom", "Sarah", "Semanth", "David")
+DF <- data.frame(ID,Gender,Names)
+DF
+```
+#Replace F with Female
+```{r}
+DF$Gender <- str_replace(DF$Gender,"F","Female")
+DF$Gender <- str_replace(DF$Gender,"M",'Male')
+DF
+```
+
