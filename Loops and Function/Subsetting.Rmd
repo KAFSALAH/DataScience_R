@@ -19,7 +19,7 @@ x<- data.frame("SN"=1:4,
           "Age"=c(21,20,25,27),
           "Name"=c("John","Dora","Mary","Jim"), "Height" = c(162,157,155,129), "Gender" = c("M","F","F","M"))
 x[c("Age","Name")] #include age and name
-x[c(-2,-3)] #Removing second and third row
+x[c(-2,-3)] #Removing second and third columns
 ```
 ```{r}
 x$SN <- x$Age <- NULL #delete rows permanently
