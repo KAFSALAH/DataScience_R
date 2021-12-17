@@ -1,5 +1,5 @@
 ---
-title: "Shiny - N Random Numbers Histogram"
+title: "Shiny - N Random Numbers Histogram & Scatter"
 author: "Salah"
 date: "12/17/2021"
 output: html_document
@@ -18,7 +18,8 @@ ui <- fluidPage(
   sliderInput(inputId = 'num',
               label = "Choose Number of n random samples",
               value = 500, min =1, max =1000),
-  plotOutput("hist")
+  plotOutput("hist"),
+  plotOutput("scatter")
 )
 ```
 
@@ -27,11 +28,17 @@ ui <- fluidPage(
 server <- function(input,output) {
   output$hist <- renderPlot({
     hist(rnorm(input$num),
-         xlab = "Numbers",
+         xlab = "Number",
          ylab = "Frequency",
-         main=  "N Random Numbers Histogram")
+         main=  "N Random Numbers Histogram Plot")
   })
-}
+  output$scatter <- renderPlot ({
+         plot(rnorm(input$num),
+         xlab = "n",
+         ylab = "value",
+         main=  "N Random Numbers Scatter Plot")
+  })
+  }
 ```
 
 # Initiate the dash board
