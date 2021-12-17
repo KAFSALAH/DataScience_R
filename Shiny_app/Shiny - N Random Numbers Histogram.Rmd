@@ -1,0 +1,42 @@
+---
+title: "Shiny - N Random Numbers Histogram"
+author: "Salah"
+date: "12/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Importing the library
+```{r}
+library(shiny)
+```
+# Build the user interface
+```{r}
+ui <- fluidPage(
+  sliderInput(inputId = 'num',
+              label = "Choose Number of n random samples",
+              value = 500, min =1, max =1000),
+  plotOutput("hist")
+)
+```
+
+# Build the server
+```{r}
+server <- function(input,output) {
+  output$hist <- renderPlot({
+    hist(rnorm(input$num),
+         xlab = "Numbers",
+         ylab = "Frequency",
+         main=  "N Random Numbers Histogram")
+  })
+}
+```
+
+# Initiate the dash board
+
+```{r}
+shinyApp(ui = ui, server = server)
+```
+
