@@ -1,0 +1,26 @@
+---
+title: "Shiny test"
+author: "Salah"
+date: "12/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages('shiny')
+```
+
+```{r}
+library(shiny)
+```
+```{r}
+ui <- fluidPage("Hello")
+
+server <- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+```
+
