@@ -1,0 +1,193 @@
+---
+title: "Statistics Introduction"
+author: "Salah"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Statistics help to make decision based on data 
+##### What are the numbers saying?
+##### Are there any trends in the data?
+##### Can we make predictions from the data?
+##### Using data from samples to draw conclusions about the population
+##### The sample should be representative of the population
+##### Predictive Analytics >> Regression – Linear regression >> Correlation coefficient >> Multiple Linear Regression >> Logistic Regression
+
+####  CATEGORIES OF STATISTICS 
+##### 1 - Descriptive
+##### Organize data and focus on main characteristics of the data.
+#####  Summary of data (Average, Mode, SD)
+#####  To describe the basic features of the data.
+#####  2 - Inferential
+#####  Generalizes the larger dataset and applies probability theory to draw conclusion.
+#####  Infer population parameters and model relationships within data.
+##### Modeling : develop mathematical equations which describes relationships between variables.
+#### Make generalization about the broader population.
+
+####  Statistical Terms
+#### Variable which is a feature characteristic of any member of a population differing in quality or quantity from another member. Eg. Age, race, height, weight, gender, degree....
+
+#### Quantitative variable A variable differing in quantity eg, weight of a person,number of pax
+#### Qualitative Variable variable differing in quality eg. Color, degree of damage to a car in an accident
+#### Discrete Variable One which no value can be assumed between two given values
+#### Continuous variable
+#### Independent variable
+#### Dependent variable - what is measured (Assess the relationship between them to find out whether changes in an independent variable areassociated with changes in a dependent variable.
+
+#### Types of data in statistics
+#### 1- Nominal (Male and Female) 2 - Ordinal (Mutually eclusive but with order, like rating) 3 - Interval 4-Ratio
+
+#### Statistical Measures 
+#### 1 - Measures of Frequency (Frequency of the data indicates the number of occurrences of any particular data value in the given dataset) (The measures of frequency are number and percentage)
+#### 2 - Measures of Central Tendency (Central Tendency indicates whether the data values accumulate in the middle of distribution or toward the end) (The measures of central tendency are mean, median and mode)
+#### 3 - Measures of Spread (Spread describes how similar or vaie the set of observed values are for a particular variable) (The measures of spread are standard deviation, variance, and quaritles)
+##### Dispersion is the extent to which a distribution is stretched or squeezed 
+
+##### Range (the distance between the minimum and the maximum)
+##### Standard deviation is Square root of the variance
+#####  Variance The average of the squared differences from the mean.  Calculate the mean. For each value, calculate the difference from the mean, and square each of the number. Calculate the mean of the squared differences
+##### SD measures the dispersion of scores around the mean
+##### How spread out are the values from what is “normal” or average
+##### The larger the SD means the larger the spread of values around the mean
+#### 4 - Measures of Position (Position identifies the exact location of a particular data value in the given data set) (The measures of position are percentiles, quartiles, and standard scores)
+
+##### Z score (Standard score)
+##### The precise location of each X value within a distribution in relation to the mean. Gives the number of SD that a score lies. Positive sign indicates above or less than the mean
+##### Z = (X – M) /s
+#####  Note : the critical Z score values when using a 95% confidence level are -1.96 and +1.96 standard deviations
+
+####   INFRENTIAL STATISTICS - HYPOTHESIS TESTING
+##### To determine if there is enough evidence in data sample to infer that a certain condition holds true for the entire population
+
+##### Null Hypothesis: is assumed to be ture unless there is strong evidence to the contrary.
+##### Alternative Hypothesis: is assumed to be true when the null hypothesis is proved false.
+
+##### Exampel Null vs alternative
+##### Null: No variation exists between variables under study
+##### Alternative: Any hypothesis other than the null
+##### Alternative / Research hypothesis – a relationship or difference exists between variables under study
+##### The wages of men and women are equal (Null)
+##### The wages between men and women are not equal
+##### The medicine is safe (Null)
+#####  If proven that the medicine is unsafe, then the null hypothesis is rejected
+
+##### Population (N) : ALL the members of a group that a researcher plans to focus on. Can be very large – cannot collect data from everyone in the population
+####  Sample (n) : a smaller group that represents a population. Want to generalize the result to a population from a smaller sample taken from that population. Assume n is randomly collected from population N that is normally distributed. Need to check these assumptions.
+
+#### STATISTICAL SIGNIFICANCE LEVEL 
+
+##### Choosing alpha value :
+##### 0.05 most often used (must be less than 0.05)
+#####  The chance of making type I error (REJECT the null H when it is ACTUALLY TRUE)  (eg. probably will make 1 error in 20 times)
+##### We want to be at least 95% confident that when reject the null hypothesis, that it is the correct decision.
+##### Note : When doing 2-tailed test. Alpha 0.05 will be divided into two >> 0.025
+
+#### TYPE 1 ERROR AND TYPE 2 ERROR
+#####  Type I error  When you REJECT the null hypothesis when the null hypothesis is TRUE () you reject H0 and you shouldn’t. FALSE POSITIVE
+#####  Type II eror, when we REJECT the alternative hypothesis when the alternative hpyothesis is TRUE(). We did not reject H0 and we shouldn't. FALSE NEGATIVE
+
+##### Alpha value is the probability of making an error, 5% is the standard (0.05)
+#####  p value greater than the alpha value, thus cannot reject the null hypothesis because ((NOT SATISTICALLY SIGNIFICANT))
+#####  p value less or equals the alpha value, the result is statistically significant. THUS REJECT THE NULL HYPOTHESIS.
+
+##### p value CANNOT be zero
+
+#### Statistical Analysis 
+#### Correlation and linear regression each explore the relationship between two quantitative variables.
+#### Correlation determines if one variable varies systematically as another variable changes.
+####  Pearson, Kendall, and Spearman (correlation tests)
+#### Linear regression specifies one variable as the independent variable and another as the dependent variable.
+
+#### Corelation code examples
+
+```{r}
+ cor(mtcars,method="pearson")
+ cor(mtcars[, 1: 3], method="spearman")
+```
+
+#### Regression Model
+##### Basic function to build linear model (linear regression) in R is lm()
+```{r}
+ml <- lm(mpg~cyl,data=mtcars) #MPG function of CYL
+summary(ml)  #gives the summary of the regression model
+```
+
+#### An example of predicting with regression, 
+
+```{r}
+X = c(3,4,4,2,5,3,4,5,3,2)
+Y= c(57,78,72,58,89,63,73,84,75,48)
+DF<-data.frame(X, Y)
+plot(DF) #Regular plot
+
+#library('tidyverse')
+#ggplot reglpot
+ggplot(DF, aes(X, Y)) + geom_point() + geom_smooth(method = "lm") 
+
+cor(DF) #Find the correlation in all DF
+
+# cor.test(DF$X, DF$Y) #If there is more than one column
+
+F = lm(Y~X) #Linear regression where Y is a function of X
+F
+summary(F)
+```
+
+#### To predict new value
+
+```{r}
+#Predict the value of Y when X = 4.5
+predict(F, newdata = data.frame(X=4.5), interval = "prediction") 
+```
+
+#### predict mpg based on hp
+
+
+```{r}
+to_correlate <-mtcars %>%
+dplyr::select(mpg,qsec,cyl,disp,hp) 
+
+
+plot(to_correlate) #Main plot with all attributes (General Understanding) 
+
+# Regplot
+ggplot(to_correlate,aes(y=mpg,x=hp)) +geom_point()+geom_smooth(method='lm',se =FALSE)
+ggplot(to_correlate, aes(y=mpg, x=hp)) + geom_jitter(width=0.1) +
+stat_smooth(method="lm", se=FALSE)
+
+# Correlation test
+#cor(to_correlate) # All correlations
+cor.test(mtcars$mpg, mtcars$hp) #Specific correlation
+FC = lm(mpg~hp, data=mtcars) #regression model where MPG is function of HP
+summary(FC)
+predict(FC, newdata = data.frame(hp=100), interval='prediction') #Using the lm() model FC, to predict the value of mpg based on hp being a 100 
+
+
+```
+
+#### Multiple regression
+####  To examine the extent to which the gas mileage(mpg) is a function ofboth gross horsepower (hp) and transmission (am) where 0 is ‘automatic’ and 1 is ‘manual’)
+
+```{r}
+# Multiple Linear Regression (Two Parameters affect) plot
+ ggplot(mtcars, aes(x=hp, y=mpg, color=factor(am))) + geom_point() + stat_smooth(method=lm, se=FALSE)
+
+#PLot the affect of two independent variables in a single line
+ggplot(mtcars, aes(x=hp, y=mpg)) + geom_point(aes(color= factor(am))) + geom_smooth(method="lm", se=FALSE) 
+```
+
+#### Predicting using multiple lineaer regression
+
+```{r}
+mpg_model <-lm(mpg ~ hp + am,mtcars)
+#summary(mpg_model)
+predict(mpg_model,newdata=data.frame(hp=110,am=1),interval='prediction')
+
+```
+
+
+
