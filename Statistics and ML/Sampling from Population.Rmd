@@ -1,0 +1,123 @@
+---
+title: "Sampling Example"
+author: "Salah"
+date: "12/27/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Sampling from Population - An Example
+#### Suppose you were asked to help develop a travel policy for business travelers based in New York City.
+#### • Imagine that the traveler has a meeting in San Francisco (airport code SFO) at a specified time t.
+#### • The policy to be formulated will say how much earlier than t an acceptable flight should arrive in order to avoid being late to the meeting due to a flight delay.
+#### The set of 336,776 flights in 2013 in the nycflights13 package, which gives airline delays from New York City airports in 2013.
+
+#### This package contains five datasets saved as “data frames” with information about all domestic flights departing from New York City in 2013, from either Newark Liberty International (EWR), John F. Kennedy International (JFK), or LaGuardia (LGA) airports
+
+
+```{r}
+library(nycflights13) #Dataset library
+library(dplyr) #Dataset manipulation
+library(mosaic) #EDA on the Dataset
+```
+
+
+
+```{r}
+data(flights)
+head(flights)
+```
+
+
+#### Simulate this situation by drawing a sample from the population of flights into SFO.
+
+```{r}
+SF <- flights %>% 
+  filter(dest=="SFO",!is.na(arr_delay)) #To remove the rows with NAs in arriving delay attribute
+SF
+```
+
+#### Working with just a sample from the population, where sample size is n = 25
+
+```{r}
+set.seed(102) # it ensures that you get the same result if you start with that same seed each time you run the same process.
+Sample25 <- SF %>%
+  sample_n(size = 25)
+Sample25
+```
+#### We are interested in the arrival delay. Focus on the variable arr_delay, and compute some useful statistics.
+#### favstats() function in the mosaic package provides a concise summary of many useful statistics.
+
+```{r}
+favstats(~arr_delay, data = Sample25) # Here we are interested in the max time >>> 136 min
+```
+#### The maximum delay is 136 minutes which is about 2 hours.
+#### So, should the travel policy be that the traveler should plan on arriving in SFO at least 2 hours ahead?
+
+#### "Naive policy: book a flight that is scheduled to arrive at least 136 minutes before."
+
+#### Is the naive policy good here?
+
+```{r}
+#Taking the whole dataset of San Francisco 
+SF %>% 
+  mutate(is.late = arr_delay > 136) %>% #Creating a new column in which if arr_delay > 136 the value is TRUE 
+  summarize(prop.late=mean(is.late)) #Give the probability of being late, seems reasonable (0.0245) or 2.5%
+```
+
+
+#### What was the actual worst delay in 2013 if we compute on the complete set of flights?
+
+```{r}
+favstats(~arr_delay, data=SF) #Whole SF dataset is taken into consideration
+```
+
+
+
+#### The maximum delay is 1007 minutes which is about 17 hours.
+#### Notice that the results from the sample are different from the results for the population.
+#### This suggest that to avoid missing a meeting, one should travel the day before the meeting. Ok, but it is
+#### • costly in terms of lodging, meals etc.
+#### • No guarantee that there will never be a delay of more than 17 hours.
+
+#### Sampling Error >> The sampling eror reflects the fact that the results we get from our sample is not going to to be exactly equal to the result we would have got if we had been able to measure the entire popuulation. And each possible sample we could take would give a different result 
+
+#### A practical travel policy will trade off small probabilities of being late against the savings in cost and traveler’s time. For instance, you might judge it acceptable to be late just 2% of the time—a 98% chance of being on time.
+
+#### The 98th percentile of the arrival delays in our data sample:
+
+```{r}
+qdata(~ arr_delay, p = 0.975, data = Sample25)
+```
+
+#### A delay of 127 minutes.
+#### Suppose we used the 130-minute & 90 minute travel policy. How well would that have worked in achieving our intention to be late for meetings only 2% of the time? With the population data in hand, it’s easy to answer this question
+
+```{r}
+tally(~ arr_delay <130, data =SF, format = "proportion" )
+# arr_delay < 130
+#       TRUE      FALSE 
+# 0.97251955 0.02748045
+tally(~ arr_delay <90, data =SF, format = "proportion" )
+# arr_delay < 90
+#       TRUE      FALSE 
+# 0.95141577 0.04858423 
+```
+
+####  The 90-minute policy would miss its mark 5% of the time, much worse than we intended. To correctly hit the mark 2% of the time, we will want to increase the policy from 90 minutes to what value?
+
+```{r}
+qdata (~ arr_delay, p = 0.98, data = SF)
+# 98% 
+# 153
+```
+
+#### It should have been about 150 minutes, not 90.
+#### But in many important real–world settings, we do not have access to the population data. We have only our sample.
+
+#### How can we use our sample to judge whether the result we get from the sample is going to be good enough to meet the 98% goal?
+#### And if it’s not good enough, how large should a sample be to give a result that is likely to be good enough?
+#### This is where the concepts and methods from statistics come in.
