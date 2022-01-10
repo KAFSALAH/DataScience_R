@@ -1,0 +1,103 @@
+---
+title: "KNN with CV"
+author: "Salah"
+date: "1/5/2022"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#### Import the necessary libraries
+
+```{r}
+library('tidyverse') #For data frame manipulation and plotting
+library('caret') #For machine learning
+library('readxl') #For Excel reading
+```
+
+#### Read the Dataset and do descriptive analysis
+
+```{r}
+DF <- read_excel('/Users/salahkaf/Downloads/labW9.xlsx') #Read the excel file as a tibble
+head(DF) #Shows top 6 rows
+tail(DF) #Shows last 6 rows
+dim(DF) #Shows number of columns and rows
+str(DF) #Presents DF structure
+summary(DF) #Presents DF summary
+```
+
+#### Checking for any missing values
+
+```{r}
+# Total number of missing values in the data set:
+cat("The total number of missing values in the dataset is" , sum(is.na(DF)))
+# Total number of missing values in the dataset per column name
+colSums(is.na(DF)) 
+```
+
+#### Changing the "outcome" column (Target value) into categorical data to apply classification
+
+```{r}
+DF$Outcome<-gsub(1,"diabetic", as.character(DF$Outcome)) #Changing 1 to diabetic
+DF$Outcome<-gsub(0,"Non-diabetic", as.character(DF$Outcome)) #Changing 0 to Non-diabetic
+DF$Outcome <- as.factor(DF$Outcome) #Make it as a factor in order to apply classification
+```
+
+
+#### Checking the final form of the DF
+
+```{r}
+head(DF)
+```
+
+#### Splitting the dataset into 70/30 
+
+```{r}
+split = 0.7
+trainIndex <- createDataPartition(DF$Outcome, p = split, list = F)
+data_train <- DF[trainIndex,]
+data_test <- DF[-trainIndex,]
+```
+
+#### Checking the training and testing subsets
+
+```{r}
+dim(data_train)
+dim(data_test)
+#### Equal number of columns (9), rows with 70% & 30% split
+```
+
+#### Apply cross validation
+
+```{r}
+train_control <- trainControl(method="cv", number=10) #10 subsets
+```
+
+#### Train the data using K nearest neighbor
+
+```{r}
+model <- train(Outcome~., data = data_train, trControl=train_control, method="knn")
+```
+
+#### Ploting the model
+
+```{r}
+plot(model)
+```
+
+#### Predict the values of test data
+
+```{r}
+predictions <- predict(model, newdata = data_test)
+```
+
+#Evaluate the outcome by using confusion Matrix
+
+```{r}
+cm <-confusionMatrix(predictions, data_test$Outcome)
+cm
+```
+
