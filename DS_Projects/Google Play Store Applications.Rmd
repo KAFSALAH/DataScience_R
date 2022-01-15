@@ -1,0 +1,336 @@
+---
+title: "R - Google Play Store applications"
+author: "Salah"
+date: "1/7/2022"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```
+This R markdown encompasses data cleaning, analysis, and visualization.
+The dataset provides data about Google Play Store applications, such as their prices, ratings, etc. 
+
+The chosen data set is imported from Kaggle.
+Link: https://www.kaggle.com/ucdkaggle/data-cleaning-analysis/report
+Import the necessary libraries 
+```
+
+```{r}
+library('tidyverse') #For data manipulation through Tidyr and Dplyr, and for plotting through ggplot2.
+library('wordcloud') #For plotting word cloud.
+library('waffle') # for plotting waffle chart.
+```
+
+
+```{r}
+Original_DF <- read.csv(file ='/Users/salahkaf/Desktop/googleplaystore.csv')
+```
+
+```
+Four ways to get initial understanding of the data 
+WAY 1 - Exploring the data set head and tail.
+```
+
+```{r}
+head(Original_DF,3) #Top 3 rows
+tail(Original_DF,3) #Last 3 rows
+```
+
+```
+WAY 2 - Exploring the data set dimensions and glimpse.
+```
+
+```{r}
+dim(Original_DF) #Dimensions of DF
+glimpse(Original_DF) #Glimpse about DF
+```
+
+```
+WAY 3 - Exploring the data set structure and summary.
+```
+
+```{r}
+str(Original_DF) #Structure of DF
+summary(Original_DF) #Summary of DF
+```
+
+```
+WAY 4 - Exploring the data set missing values.
+```
+
+```{r}
+# Total number of missing values in the data set
+cat("The total number of missing values in the dataset is" , sum(is.na(Original_DF)))
+# Total number of missing values in the data set per column name
+colSums(is.na(Original_DF)) 
+```
+
+```
+Four ways of subsetting / choosing row or columns.
+Here we want to remove the unnecessary columns for this analysis. 
+They are [1 - Last.Updated 2 - Current.Ver 3 - Android.Ver].
+At this point, we will consider all rows are important so we will keep them from manipulation.
+Except in the fourth way we will select specific rows for demonstration purposes.
+Way 1 - using regular index method for columns selection.
+```
+
+```{r}
+subsetted1 <- Original_DF[,-(11:13)] #Remove last three columns
+head(subsetted1,3) #Show first three rows
+```
+
+```
+WAY 2 - using subset function for columns selection.
+```
+
+```{r}
+subsetted2 <- subset(Original_DF, select = c(App:Genres)) #Remove last three columns
+head(subsetted2,3) #Show first three rows
+```
+
+```
+WAY 3 - using select function for columns selection
+```
+
+```{r}
+subsetted3 <- select(Original_DF, 1:10) #Remove last three columns
+head(subsetted3,3) #Show first three rows
+```
+
+```
+WAY 4 - subsetting rows and columns by the three above methods.
+And Selecting only apps in "business" category.
+```
+
+```{r}
+subsetted4A <- Original_DF[Original_DF$Category =="BUSINESS",1:10] #Regular indexing
+subsetted4B <- subset(Original_DF, Category == "BUSINESS" , select = c(App:Genres)) #Subset method.
+subsetted4C <- filter(select(Original_DF, 1:10), Category == "BUSINESS") #Filter method
+head(subsetted4A,2)
+head(subsetted4B,2)
+head(subsetted4C,2)
+```
+
+```
+c. Four ways to Preprocess data (Cleaning, etc)
+WAY 1 - remove missing values using complete case code.
+```
+
+```{r} 
+dim(subsetted1) #Before cleaning is 10841 rows
+subsetted1 <- subsetted1[complete.cases(subsetted1),]
+dim(subsetted1) #After cleaning should be 10841 - 1474 = 9367 rows
+```
+
+```
+WAY 2 - remove missing values using na.omit.
+```
+
+```{r}
+dim(subsetted2) #Before cleaning is 10841 rows
+subsetted2 <- na.omit(subsetted2)
+dim(subsetted2) #After cleaning should be 10841 - 1474 = 9367 rows
+```
+
+```
+WAY 3 - replacing missing values with mean values.
+```
+
+```{r}
+MeanOfRatings <- mean(subsetted3$Rating, na.rm = T) #Finding the mean of the "Rating" column
+subsetted3$Rating[is.na(subsetted3$Rating)] <- MeanOfRatings
+dim(subsetted3) #Should not change, thus there must be 10841.
+anyNA(subsetted3) #Should be "False", which implies there is no missing values.
+```
+
+```
+WAY 4 - Giving the misssing values avalue of 0.
+```
+
+```{r}
+subsetted4D <- Original_DF[,1:10]
+subsetted4D$Rating <- 
+  gsub(NaN, 0, as.double(subsetted4D$Rating))  #Replacing missing values values with 0
+subsetted4D$Rating <- as.double(subsetted4D$Rating) #Saving the column as double
+subsetted4D[23:25,1:3] #Checking row 23-25 for confirmation.
+```
+
+```
+Subsetted 3 & 4 results are not apporiate for our analysis as they provide inaccurate results.
+(Replacing missing values with 0s or average is not preferable here).
+So we will go with subsetted 1 & 2 (Removing rows with missing values).
+(13.6% of data will be lost, which is acceptable in this situation).
+Since Subsetted1, and subsetted2 sets are exactly the same,
+we will take subsetted1 as the main data set to continue our analysis.
+Final touch is to convert some columns into ineger type.
+```
+
+```{r}
+subsetted1$Reviews <- as.integer(subsetted1$Reviews) #Make the "Reviews" column type as integer.
+
+subsetted1$Installs <- str_replace_all(subsetted1$Installs,",","") #Removing ","
+subsetted1$Installs <- str_sub(subsetted1$Installs,1,nchar(subsetted1$Installs)-1) #Removing "+"
+subsetted1$Installs <- as.integer(subsetted1$Installs) #Convert to integers
+
+#Converting to integers will make one row has an NA value
+#removing that row 
+dim(subsetted1)
+subsetted1 <- na.omit(subsetted1)
+dim(subsetted1)
+```
+
+```
+Write one function and use the function for the dataset .
+The ratings in the data set out of 5,
+will will create a column to make the ratings in percentage form.
+```
+
+```{r}
+# Function creation - The function calculate the rating percentage out of 100% instead of 5 stars.
+ScaleConversion <- function(x) {
+  RatingPercentage = (x/5) * 100
+  return(RatingPercentage)
+}
+# applying the function on the data set
+subsetted1 <- mutate(subsetted1, RatingPercentage = ScaleConversion(subsetted1$Rating))
+# Placing the new column next to "Rating" column
+subsetted1 <- relocate(subsetted1,  RatingPercentage, .after= Rating)
+head(subsetted1,2)
+```
+
+```
+This data set gives general understanding about apps
+ratings, prices, number of downloads, and categories, etc.
+The aim of this analysis is to answer these three questions, 
+Q1 - Which genres are most popular?
+Q2- Which genres are most liked?
+Q3 - What is the free/paid ratio?
+Furthermore, for simplicity purposes. Each question will be treated with a unique DF.
+Solutions:
+Q1 - Which genres are most popular?
+Prepare a subset suitable for plotting.
+```
+
+```{r}
+A1DF <- subsetted1 #Unique DF for Answer 1 
+most_downloaded <- data.frame(tapply(A1DF$Installs,A1DF$Category,sum)) # Sum number of installs per category
+head(most_downloaded,4)
+most_downloaded$Category <- rownames(most_downloaded) #Make the index as a column 
+rownames(most_downloaded) <- NULL #Remove the index since there is no need for it any more
+colnames(most_downloaded)[1] <- "Total_Downloads" #Renaming the downloads count column
+most_downloaded <- relocate(most_downloaded, Category, .before = "Total_Downloads") #Reordering columns
+most_downloaded
+```
+
+```
+Plotting A1.  Bar Chart
+```
+
+```{r}
+A1plot_bar <- ggplot(data=most_downloaded, aes(y=Category,x=Total_Downloads
+)) +
+  geom_bar(stat= "identity",fill="#56B4E9") + 
+  ggtitle("Number of Installs per Category") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlab("Installs") + ylab("Category")
+A1plot_bar
+```
+
+```
+Plotting A1 Cloud words
+```
+```{r}
+most_downloaded[7,1] <- "COM" #Changing COMMUNICATION TO COM in order to fit it in the next plot.
+A1Word_plot <- wordcloud(words = most_downloaded$Category,
+                         freq = most_downloaded$Total_Downloads, min.freq = 1,
+          max.words=2000, random.order=FALSE, rot.per=0.35,
+          colors=brewer.pal(8, "Dark2"))
+```
+
+```
+Create a table for top 10 categories
+```
+
+```{r}
+top10_downloaded <- arrange(most_downloaded, desc(Total_Downloads)) #Arrange DF in descending order
+top10_downloaded <- top10_downloaded[1:10,]
+top10_downloaded$Percentage <- 
+ round((top10_downloaded$Total_Downloads)*100/sum(top10_downloaded$Total_Downloads),2)#Percentage Generating
+top10_downloaded$Percentage <- paste(top10_downloaded$Percentage,"%") #Append"%" sign
+top10_downloaded
+```
+
+```
+Q2- Which categories are most liked?
+Here we need to set an important criterion, some apps are rated above 4 starts,
+yet the number of voters are less than 1000 person.
+It is unfair to make comparison between 3star apps with milion view with a 4.5 starts app with 250 view only.
+We will omit all applications where number of review is less than 1000.
+```
+
+```{r}
+A2DF <- subsetted1 #Unique DF for A2
+dim(A2DF) # 9366 rows before filtering 
+A2DF <- filter(A2DF, Reviews >= 1000)  
+dim(A2DF) # 5896 rows after filtering
+A2mean <- data.frame(tapply(A2DF$Rating,A2DF$Category,mean)) #Weight the average per category
+head(A2mean,2)
+
+
+A2mean$AverageRating <-round(A2mean[,1],2)
+A2mean$Category <- rownames(A2mean)
+rownames(A2mean) <- NULL
+A2mean[,1] <-NULL
+A2mean <- arrange(A2mean, desc(AverageRating))[1:10,]
+A2mean <- relocate(A2mean, Category, .before = "AverageRating") #Reordering columns
+A2mean
+```
+
+```
+PLotting top 10 genres based on their rating.
+```
+
+```{r}
+Q2plot_Pie <- ggplot(A2mean, aes(x="", y=AverageRating, fill=Category)) +
+  geom_bar(stat="identity", width=1, color="White") +
+  coord_polar("y", start=0) + 
+  ggtitle("Top 10 Rated Genres out of 5 Stars") +
+  theme(plot.title = element_text(hjust = 0.5))+
+    geom_label(aes(label = AverageRating),
+             position = position_stack(vjust = 0.35),
+             show.legend = FALSE) +
+  theme_void() # remove background, grid, numeric labels
+Q2plot_Pie
+```
+
+```
+Q3 - What is the free/paid ratio?
+```
+
+```{r}
+A3DF <- subsetted1 #Unique DF for Q3
+A3DF <- count(A3DF,Type)
+A3DF$percentage <- round(A3DF$n/sum(A3DF$n),2)
+A3DF
+```
+
+```
+Plotting waffle chart 
+```
+
+```{r}
+A3DF <- c(Free = 93, Paid = 7)
+waffle(A3DF)
+```
+
+```
+Concluded insights:
+
+1 - Gaming industry is dominat in the Google Play Store.
+2 - Altough communication apps are also dominant, they are not in the top 10 liked categoires.
+3 - Most Apps are free. Apps devlopers are more interested in ads or microtransactions (inside app purchase).
+```
+
