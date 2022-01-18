@@ -1,0 +1,516 @@
+---
+title: "Identification of Bank Customers Pipeline Using K-Means Method to Enable Marketing Personalization"
+author: "BDM Project - Group 2"
+date: "1/18/2022"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = T}
+library(tidyr) #For data manipulation 
+library(dplyr) #For data manipulation
+library(ggplot2) #For data visualization
+library(magick) #For images 
+library(data.table) # provides higher performance version of R's basic function data.frame
+library(mltools) #For one hot encoding
+library(factoextra) #For clusters Visualization 
+library(gridExtra) #For clusters Visualization 
+library(scales) # for scaling variables
+```
+
+### Introduction
+```
+The Big Data Management (BDM) cycle begins with setting the architecture
+by which large, swift, and various data forms are handled, from A to Z,
+with as few human interactions as possible.
+As humans’ capabilities are limited in speed, it became a necessity to
+design a BDM architecture that handles various tasks
+starting from data collecting, to parallel storage and Map Reducing,
+until eventually reaching to the end line, which is decision making and actions.
+```
+
+```{r,echo = F}
+Figure1 <- image_read('/Users/salahkaf/Desktop/BDM\ cycle.png')
+Figure1
+```
+
+### Problem Statement
+```
+Nowadays, the rivalry among competitors in all types of businesses is at its peak.
+If business owners do not keep up with the new requirements in the business world,
+they will quickly be left behind and lose to other competitors.
+Customer segmentation has become an essential tool in the Big data and business world,
+especially with the rise of machine learning technologies and the abundance of beneficial data.
+Therefore, all businesses which will not use machine learning techniques will fail in the future.
+To enhance banks performance, we will build a predictive machine learning model
+that uses clusterings algorithm to segment customers into categories
+to help banks personalize products according to customer’s demographic and behavioral attributes.
+```
+
+```{r, echo = F}
+Figure2 <- image_read('/Users/salahkaf/Desktop/Problem\ Statement.png')
+Figure2
+```
+
+### Scope of Work - Objectives 
+```
+It is challenging to direct personal ads to millions of users simultaneously.
+As there will be different groups and orientations.
+Therefore, advertisements personalization has become a big data problem in the marketing industry.
+This is accomplished by doing the following,
+
+A. Enhancing big data resources management in banks/firms.
+by automating the annotation process of customers (Auto Labeling via clustering).
+B. Enabling flexibility when handling vast records of customers. 
+C. Strategizing Marketing Techniques by making advertisements more accurately personalized by machine learning.
+D. Minimizing the possibility of risks in future investments.
+E. Keeping up with the rapid speed of customers' data expansion.
+F. Detecting fraudulent/suspicious accounts (Outliers).
+```
+### Current solutions - Supervised Learning
+```
+There are many approaches which can be done to direct personal ads.
+But the strongest so far is AI,
+because machine learning can learn from the past (collected data)
+to predict the future with high accuracy and with very short time. 
+
+As J. Chio, and K. Lim stated in their paper,
+"Identifying machine learning techniques for classification of target advertising",
+AI is better than traditional practices as it provides enhanced computational power,
+which advances the optimization of digital advertisements.
+
+Yet the major drawback in Supervised learning is that we annotate MANUALLY the parent for each user.
+In this case (Hundred of thousands of users are annotated by humans)
+to predict in the future what class the new customer is in.
+
+Furthermore, we are limiting the number of parents (groups) from the beginning of analysis,
+if new customers come with new personalizations, the system would not cast them
+under a specific parent accurately.
+```
+### Proposed Solution - Unsupervised Learning
+```
+We propose a business solution that automatically clusters bank clients
+based on their financial demeanor and attributes.
+This solution aims to achieve a systematic customer inspection
+that collects and analyzes their data unsurprisingly,
+which further enhances big data resources management
+as it does not require human interaction to annotate customers or classify them
+under certain clusters.
+Instead, the proposed algorithm gathers similar observations (customers)
+under one parents clusters (group), then the marketing department can create
+advertisements that directly connect with the clients based on their groups.
+```
+```{r,echo = F}
+Figure3 <- image_read('/Users/salahkaf/Desktop/BDM\ flowchart.png')
+Figure3
+```
+### Simulation and Results 
+```
+In this project, we created a pipeline that takes data from the database through SQL- like commands,
+then descriptive and exploratory analysis is made and presented on the dashboard
+to help bank business analytics understand how their customers behave.
+```
+
+#### A. Initial Understanding about the data
+```{r}
+Original_DF <- read.csv('/users/salahkaf/desktop/Dataset.csv')
+```
+
+```
+Getting initial understanding of the data 
+1 - Exploring the data set head and tail.
+```
+
+```{r}
+head(Original_DF,5) #Top 5 rows
+tail(Original_DF,5) #Last 5 rows
+```
+```
+2 - Exploring the data set dimensions and glimpse.
+```
+
+```{r}
+glimpse(Original_DF) #Glimpse about DF
+```
+
+```
+3 - Exploring the data set structure and summary.
+```
+
+```{r}
+summary(Original_DF) #Summary of DF
+```
+
+```
+4 - Exploring the data set missing values. 
+```
+
+```{r}
+# Total number of missing values in the data set
+cat("The total number of missing values in the dataset is" , sum(is.na(Original_DF)))
+# Total number of missing values in the data set per column name
+colSums(is.na(Original_DF)) 
+```
+
+### Cleaning the missing values
+```
+One of the essential key points here is to decide which replacement i.e.,
+imputation technique is valid to get the most effective results.
+Our options here is to either:
+A. To omit these values. 
+B. To use central tendency measurements (Mean. median, or mode).
+
+However, option A in this case will make us lose customers data, 
+which opposes what we want.
+Let us plot a box plot.
+```
+
+### Box plot to analyze the centeral tendencies 
+
+```{r}
+Experience_Box <- ggplot(Original_DF, aes(x = Work_Experience, y = '')) +
+  geom_boxplot(fill="green") +
+  ggtitle("Years of Work Experience Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Years") + ylab("Box") 
+Experience_Box
+Family_Box <-  ggplot(Original_DF, aes(x = Family_Size, y = '')) +
+  geom_boxplot(fill="Blue") +
+  ggtitle("Number of Persons in Famlies Distribution") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Number of Persons") + ylab("Box") 
+Family_Box
+```
+
+```
+In both cases, we observe that both plots indicate that data looks to be right-skewed (long tail in the right).
+Therefore it is more appropriate to use median value than the mean.
+```
+
+```{r}
+ExperienceMedian <- median(Original_DF[,7], na.rm = T)
+cat("The median value for work experience is", ExperienceMedian, "year \n")
+FamilySizeMedian <- median(Original_DF[,9],na.rm = T)
+cat("The median value for family size is", FamilySizeMedian, "persons \n")
+```
+
+```
+Replacing the missing values in each column with the Median of that column
+```
+```{r}
+Original_DF$Work_Experience[is.na(Original_DF$Work_Experience)] <- ExperienceMedian
+Original_DF$Family_Size[is.na(Original_DF$Family_Size)] <- FamilySizeMedian
+
+summary(Original_DF)
+```
+
+
+### Visualized Analysis
+
+
+### Bar plot for the frequencies of spending scores of the customers
+```{r}
+Original_DF_bar <- Original_DF[c("Spending_Score","Family_Size" )]
+# setting the family size as a factor for plotting.
+Original_DF_bar$Family_Size <- as.factor(Original_DF_bar$Family_Size)
+ggplot(Original_DF_bar, aes(Spending_Score, fill = Family_Size)) + 
+  geom_bar() +labs(title = "Barplot for the frequency of the spending score for customers"
+                   , y = "Frequency", x = "The spending Scores")
+```
+```
+We can conclude from the above bar graph the following:
+1- Customers who have low spending score are more than those with a spending score of high
+or average by a factor of 3 to 4.
+
+2- Customers who have average and high spending score usually have a family size of 2
+to 5 members and almost no family size of one member at all.
+
+3- customers with a low spending score have a wider distribution of family size, 
+going from 1 member to 9 members with an ascending decline in the frequency according to the family size.
+```
+### Barplot for the Professions of the customers
+```{r}
+Original_DF_bar2 <- Original_DF[c("Profession", "Family_Size", "Spending_Score")]
+Original_DF_bar2$Profession[Original_DF_bar2$Profession == "Artist"] <- "Others"
+# deleting rows according to the profession column that has "" as a value
+Original_DF_bar2 <- filter(Original_DF_bar2, Profession != "")
+Original_DF_bar2$Spending_Score <- factor(Original_DF_bar2$Spending_Score,
+                                          levels=c("High", "Average", "Low"))
+Original_DF_bar2 <- group_by(Original_DF_bar2,Profession )
+Original_DF_bar2 <- summarise(Original_DF_bar2, average= mean(Family_Size),
+)
+Original_DF_bar2
+ggplot(Original_DF_bar2, aes(Profession, average, fill =Profession   )) +
+  geom_col()+
+  scale_x_discrete(guide = guide_axis(n.dodge=3)) + 
+  labs(title = "Average family sizes Vs Professions ", x = "Professions",
+       y = "avrage family sizes")
+```
+```
+Overall, the family size for all professions has a small range of dissimilarity.
+Healthcare and Executive are the highest and homemaker and lawyer are the lowest.
+```
+
+### line graph  for Work experience average Vs the spending score
+```{r}
+Original_DF_line <- Original_DF[c("Work_Experience", "Family_Size","Spending_Score" )]
+Original_DF_line <- group_by(Original_DF_line,Spending_Score )
+Original_DF_line <- summarise(Original_DF_line, average = mean(Work_Experience))
+Original_DF_line <- arrange(Original_DF_line, desc(average))
+Original_DF_line$Spending_Score <- factor(Original_DF_line$Spending_Score,
+                                           levels=c("Low", "Average", "High"))
+Original_DF_line
+ggplot(Original_DF_line, aes(Spending_Score,  average, group = 1)) +
+  geom_line() + geom_point() +labs(title = "Average work experience Vs the spending score",
+                                   x = "The spending score",
+                                   y = "work experience average")
+```
+```
+We can conclude from the above bar graph the following:
+
+The higher the number of working experience the lower the spending score.
+
+```
+
+### Pie charts for females and males spending scores frequency
+```{r}
+# data manipulation for females
+Original_DF_Pie <-  Original_DF[c("Gender", "Spending_Score")]
+Original_DF_Pie_F <- filter(Original_DF_Pie, Gender == "Female")
+Original_DF_Pie_F <- group_by(Original_DF_Pie_F, Spending_Score)
+Original_DF_Pie_F <- summarise(Original_DF_Pie_F, Female_Frequency = length(Gender))
+Original_DF_Pie_F
+
+total_females <- nrow(filter(Original_DF_Pie, Gender == "Female"))
+total_males <- nrow(filter(Original_DF_Pie, Gender == "Male"))
+#data manipulation for males
+Original_DF_Pie_M <- filter(Original_DF_Pie, Gender == "Male")
+Original_DF_Pie_M <- group_by(Original_DF_Pie_M, Spending_Score)
+Original_DF_Pie_M <- summarise(Original_DF_Pie_M, Male_Frequency = length(Gender))
+Original_DF_Pie_M
+
+F_Pie <- ggplot(Original_DF_Pie_F, aes(x="", y=Female_Frequency, fill=Spending_Score))+
+geom_bar(width = 1, stat = "identity") + coord_polar("y", start=0) +
+  theme(plot.title = element_text(hjust = 0.5))+
+    geom_label(aes(label = percent(Female_Frequency/total_females)),
+             position = position_stack(vjust = 0.5),
+             show.legend = FALSE, size = 2.5) +
+  labs(title = "Spending scores for females")+
+  theme_void() # remove background, grid, numeric labels
+
+M_Pie <- ggplot(Original_DF_Pie_M, aes(x="", y=Male_Frequency, fill=Spending_Score))+
+geom_bar(width = 1, stat = "identity") + coord_polar("y", start=0) +
+  theme(plot.title = element_text(hjust = 0.5))+
+    geom_label(aes(label = percent(Male_Frequency/total_males)),
+             position = position_stack(vjust = 0.5),
+             show.legend = FALSE, size = 2.5)+
+  labs(title = "Spending scores for males")+
+  theme_void() # remove background, grid, numeric labels
+
+grid.arrange(M_Pie, F_Pie, nrow = 1)
+
+```
+
+```
+The above pie charts show that the percentage of males who have an average or a high
+spending score is higher than the percentage of females with a high or an average 
+spending score..
+
+```
+### Bar plot for the number of people who whether have even been married or not:
+```{r}
+Original_DF_bar3 <- filter(Original_DF,Ever_Married != "" )
+Original_DF_bar3$Spending_Score <- factor(Original_DF_bar3$Spending_Score,
+                                           levels=c("Low", "Average", "High"))
+ggplot(Original_DF_bar3,aes(Ever_Married, fill = Spending_Score)) +
+  geom_bar()+ scale_fill_manual(values = c("dodgerblue4", 
+                                           "forestgreen", "firebrick")) +
+  labs(title = "Marital status", x = "married or not", y = "frequency") + 
+  theme_gray()
+```
+
+```
+The bar graph above shows that peopel who are not married predominantly have a 
+low spending score. For married people, the spending score is normally distributed, 
+meaning that most values are close to the average.
+```
+
+### Box plot for the spending scores Vs customers age
+```{r}
+names(Original_DF)
+Original_DF_box <- Original_DF
+Original_DF_box$Spending_Score <- factor(Original_DF_box$Spending_Score,
+                                           levels=c("Low", "Average", "High"))
+ggplot(Original_DF_box, aes(Spending_Score, Age, fill =  Spending_Score)) + 
+  geom_boxplot()+ scale_fill_manual(values = c("dodgerblue4", 
+                                           "forestgreen", "firebrick"))+ 
+  labs(title = "Box plot for age distribution Vs the spending score", 
+       x = "The spending score", y = "Customers Age")
+```
+
+```
+According to the distribution of the box plots above, there is a positive correlation 
+between the customers age and their spending scores, the older peopel are, the
+higher their spending score is.
+
+It is also important to mention that the low and average spending scores have many up skewed outliers
+that are above the third quartile which is more than 75% of the age values for low and average spending
+score.
+```
+
+### Machine Learning Analysis
+
+```
+Meta data about the columns,
+
+1 - ID >> Unique ID
+2 - Gender >> Gender of the customer.
+3 - Ever_Married >> Marital status of the customer.
+4 - Age >> Age of the customer.
+5 - Graduate >> Is the customer a graduate?
+6 - Profession >> Profession of the customer.
+7 - Work_Experience >> Work Experience in years.
+8 - Spending_Score >> Spending score of the customer.
+9 - Family_Size >> Number of family members for the customer (including the customer).
+10 - Var_1 >> Anonymised Category for the customer.
+```
+
+```{r,echo = F}
+Figure4 <- image_read('/Users/salahkaf/Desktop/ClusterA.jpg')
+Figure5 <- image_read('/Users/salahkaf/Desktop/ClusterB.jpg')
+Figure6 <- image_read('/Users/salahkaf/Desktop/ClusterC.jpg')
+Figure7 <- image_read('/Users/salahkaf/Desktop/ClusterD.jpg')
+ 
+Figure4
+Figure5
+Figure6
+Figure7
+```
+```
+We need to clarify that there are two types of clustering, 
+A. Hard clustering: Each data point belongs to a specific cluster.
+K-means clustering is the algorithm used for hard clustering.
+B. Soft clustering: Each data point exists in all the clusters with some probability. 
+The algorithm used for hard clustering is the k-means clustering method.
+```
+
+```
+In our project, we will be using hard clustering,
+which will help us in predicting which clusters are most suitable for the new customers.
+K- means  algorithm  determines the cluster's centroid.
+It is unsupervised-learning iterative technique. 
+Steps 
+1 - Specify number of clusters (K).
+2 - Randomly assign each data point to a cluster.
+3 - Calculate cluster centroids.
+4 - Re-allocate each data point to their nearest cluster centroid.
+5 - Re-figure cluster centroid.
+```
+
+### Removing ID, and Var_1 Columns
+```{r}
+Train <- Original_DF[,-c(1,10)]
+head(Train,4)
+```
+
+### Changing charechter columns into factor column
+
+```{r}
+Train$Gender <- as.factor(Train$Gender)
+Train$Ever_Married <- as.factor(Train$Ever_Married)
+Train$Graduated <- as.factor(Train$Graduated)
+Train$Spending_Score <-as.factor(Train$Spending_Score)
+ Train$Profession <- as.factor(Train$Profession)
+
+head(Train,4)
+```
+### Apply one hot enconding
+
+```{r}
+Train <- one_hot(as.data.table(Train))
+head(Train,4)
+```
+### Removing the duplicate columns
+```{r}
+Train <- Train[,-c(3,7,10)]
+head(Train,4)
+```
+
+### Train the models
+
+```{r}
+kmeans2 <- kmeans(Train, centers = 2, nstart = 25)
+kmeans3 <- kmeans(Train, centers = 3, nstart = 25) 
+kmeans4 <- kmeans(Train, centers = 4, nstart = 25)
+kmeans5 <- kmeans(Train, centers = 5, nstart = 25)
+```
+
+```{r}
+ #Comparing the Plots
+ plot1 <- fviz_cluster(kmeans2, geom = "point", data = Train) + ggtitle("k = 2")
+ plot2 <- fviz_cluster(kmeans3, geom = "point", data = Train) + ggtitle("k = 3")
+ plot3 <- fviz_cluster(kmeans4, geom = "point", data = Train) + ggtitle("k = 4")
+ plot4 <- fviz_cluster(kmeans5, geom = "point", data = Train) + ggtitle("k = 5")
+ plot1
+ plot2
+ plot3
+ plot4
+
+ grid.arrange(plot1, plot2, plot3, plot4, nrow = 2)
+```
+
+### Interpreting the results for K = 2, K = 3 and K = 4
+
+```{r}
+kmeans2
+```
+
+```{r}
+kmeans3
+```
+
+```{r}
+kmeans4
+```
+
+```
+Model Validation by Finding Best No. of Ks Using Elbow Method.
+```
+```
+As the dataset has no truth values, i.e., classified reference values
+to calculate True Positive, True Negative, False Positive, and False Negative,
+Precision and Recall calculations are not feasible. 
+However, the most suitable number of Ks can be calculated by
+identifying the total within clusters sum of squares as below.
+```
+
+```{r}
+#Elbow Method for finding the optimal number of clusters
+set.seed(123)
+# Compute and plot wss for k = 2 to k = 15.
+k.max <- 15
+data <- Train
+wss <- sapply(1:k.max, 
+              function(k){kmeans(data, k, nstart=25,iter.max = 15 )$tot.withinss})
+wss
+plot(1:k.max, wss,
+     type="b", pch = 19, frame = FALSE, 
+     xlab="Number of clusters K",
+     ylab="Total within-clusters sum of squares")
+```
+
+
+### Conclusion
+```
+In this project, we developed a pipeline that collects the data,
+cleans it, then analyzes it visually. The pipeline also clusters observations,
+i.e., customers, into groups without human interactions. These clusters are hard k-means clusters,
+which annotate the observation to be in a specific parent.
+thus, the project will make crowd behavior identification and understanding more efficient
+as it is relativly fasterin implementation than supervised learning.
+Furthermore, the project contributes in enhancing personalized advertiesments
+and improving the big data management cycle.
+```
