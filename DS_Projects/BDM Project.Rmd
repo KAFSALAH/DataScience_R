@@ -20,7 +20,6 @@ library(factoextra) #For clusters Visualization
 library(gridExtra) #For clusters Visualization 
 library(scales) # for scaling variables
 ```
-
 ### Introduction
 ```
 The Big Data Management (BDM) cycle begins with setting the architecture
