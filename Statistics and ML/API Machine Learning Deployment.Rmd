@@ -1,0 +1,65 @@
+---
+title: "API Deployment"
+author: "Salah"
+date: "1/21/2022"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(caret)
+```
+
+```{r}
+iris %>%  count(Species)
+iris
+```
+
+```{r}
+split=0.80 #Splitting the data.
+trainIndex <- createDataPartition(iris$Species, p=split, list=FALSE)
+train_data <- iris[ trainIndex,]
+test_data <- iris[-trainIndex,]
+
+#Create a grid search cv
+train_control <- trainControl(method="cv", number=10)
+
+#Train the model
+
+FlowerSpecies <- train(Species~., data=train_data, trControl=train_control,
+method="knn")
+#Evaluate model accuracy
+
+predictions<-predict(FlowerSpecies, newdata = test_data)
+confusionMatrix(predictions, test_data$Species)
+
+# Save the model as an object
+save(FlowerSpecies, file = "/Users/salahkaf/desktop/model.RData")
+```
+
+```{r}
+library(plumber)
+
+#* @apiTitle Flower Species Classification
+#* @param petal_length Enter petal length
+#* @param petal_width Enter petal width
+#* @param sepal_length Enter sepal length
+#* @param sepal_width Enter sepal width
+#* @post /Classifier
+
+function(petal_length, petal_width, sepal_length, sepal_width){
+
+  load("/Users/salahkaf/desktop/model.RData")
+
+  test = c(sepal_length, sepal_width, petal_length, petal_width)
+  test = sapply(test, as.numeric)
+  test = data.frame(matrix(test, ncol = 4))
+
+  colnames(test) = colnames(iris[,1:4])
+  predict(model, test)
+}
+```
+
