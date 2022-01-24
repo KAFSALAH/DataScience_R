@@ -225,7 +225,6 @@ Q3Cplot_box <- ggplot(data = Q3DF, aes(x = "", y = Q3DF)) +
 Q3Cplot_box
 ```
 
-
 ```
 Q4 - What are the immigrants counts for the top 5 immigrants countries from 1980 to 2013.
 ```
