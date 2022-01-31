@@ -1,0 +1,227 @@
+---
+title: "Machine Learning Introduction"
+author: "Salah"
+date: "1/27/2022"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(caret)
+library(klaR) #To use NaiveBayes()
+```
+
+#### Split data into training and test data subsets
+
+```{r}
+data(iris)  # load the iris dataset
+split= 0.8 # define an 80%/20% train/test split of the dataset
+trainIndex <- createDataPartition(iris$Species, p = split, list = F)
+# class(trainIndex) # "matrix" "array" 
+data_train <- iris[trainIndex,]
+data_test <- iris[-trainIndex,]
+data_train #120 rows, 5 columns
+data_test #30 rows, 5 columns
+
+# Alternative
+# i10<-ir_data[1:10,]
+# set.seed(100)
+# s<-sample(1:10,7)
+# i7<-i10[s,]
+# i3<-i10[-s,]
+```
+
+
+#### Train Model
+
+
+```{r}
+data(iris) #Loading the dataset
+split = 0.80 
+trainIndex <- createDataPartition(iris$Species, p=split, list=FALSE)
+data_train <- iris[trainIndex,]
+data_test <- iris[-trainIndex,]
+
+# train a naive bayes model
+model <- NaiveBayes(Species~., data = data_train) #Species is the target column
+# Train a knn model
+model1 <- train(Species~., data = data_train, method = 'knn')
+# Make predictions 
+
+x_test <- data_test[,1:4] #The attributes (Independent variables)
+y_test <- data_test[,5] #The target variable
+
+predictions <- predict(model,x_test)
+confusionMatrix(predictions$class, y_test)  # summarize results Compare between predicted values, and true y_test values)
+
+
+#Alternative approach
+prediction <- predict(model1, newdata = data_test)
+confusionMatrix(prediction,data_test$Species)
+```
+
+#### How to limit over fitting
+
+#### Both overfitting and underfitting can lead to poor model performance. But by far the most common problem in applied machine learning is overfitting.
+####  an indication of how well the model will generalize to an independent/ unseen data set
+####  There are two important techniques that you can use. when evaluating machine learning algorithms to limit overfitting:
+#### Use a resampling technique to estimate model accuracy.
+####  Hold back a validation dataset.
+####  The most popular resampling technique is k-fold cross validation. It allows you to train and test your model k-times on different subsets of training data and build up an estimate of the performance of a machine learning model on unseen data.
+#### A validation dataset is simply a subset of your training data that you hold back from your machine learning algorithms until the very end of your project. After you have selected and tuned your machine learning algorithms on your training dataset you can evaluate the learned models on the validation dataset to get a final objective idea of how the models might perform on unseen data.
+#### Using cross validation is a gold standard in applied machine learning for estimating model accuracy on unseen data. If you have the data, using a validation dataset is also an excellent practice.
+
+
+#### Corss Validation 
+#### Systematically creates and evaluates multiple models on multiple subsets of the dataset.
+#### your model has got most of the patterns from the data correct, and its not picking up too much on the noise
+#### K-fold the data is divided into k subsets
+#### the holdout method is repeated k times, such that
+#### each time, one of the k subsets is used as the test set/ validation set and the other k-1 subsets are put together to form a training set. This process is completed until accuracy is determine for each instance in the dataset, and an overall accuracy estimate is provided.
+
+
+#### Train control
+
+```{r}
+data(iris)  # load the iris dataset
+split = 0.80  # define an 80%/20% train/test split of the dataset
+trainIndex <- createDataPartition(iris$Species, p=split, list=FALSE)
+data_train <- iris[ trainIndex,]
+data_test <- iris[-trainIndex,]
+
+#use train() and trainControl()
+
+train_control <- trainControl(method = "cv", number =10)
+# train the model
+model1 <- train(Species~., data=data_train, trControl=train_control, method="nb")
+predictions1<-predict(model1, newdata = data_test)
+cm1<-confusionMatrix(predictions1,data_test$Species)
+cm1
+
+```
+
+# K fold r code sample
+
+```{r}
+# load the library
+library(caret)
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="cv", number=10)
+# fix the parameters of the algorithm
+grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+
+```
+
+#### Repeated k fold sample code
+
+```{r}
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="repeatedcv", number=10, repeats=3)
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+
+```
+
+#### Leave one out CV sample code
+
+```{r}
+# load the library
+library(caret)
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="LOOCV")
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+
+```
+
+
+#### Evaluation machine learning models 
+
+#### Accuracy and Kappa
+#### RMSE and R^2
+#### ROC (AUC, Sensitivity and Specificity)
+#### LogLoss
+#### Caret uses Accuracy for classification and RMSE for regression
+
+```{r}
+# load libraries
+library(caret)
+library(mlbench)
+# load the dataset
+data(PimaIndiansDiabetes)
+# prepare resampling method
+control <- trainControl(method="cv", number=5)
+set.seed(7)
+fit <- train(diabetes~., data=PimaIndiansDiabetes, method="glm", metric="Accuracy", trControl=control)
+# display results
+print(fit)
+
+```
+
+#### RMSE
+
+```{r}
+# load data
+data(longley)
+# prepare resampling method
+control <- trainControl(method="cv", number=5)
+set.seed(7)
+fit <- train(Employed~., data=longley, method="lm", metric="RMSE", trControl=control)
+# display results
+print(fit)
+
+```
+
+#### ROC / AUC
+
+```{r}
+library(mlbench)
+# load the dataset
+data(PimaIndiansDiabetes)
+# prepare resampling method
+control <- trainControl(method="cv", number=5, classProbs=TRUE, summaryFunction=twoClassSummary)
+set.seed(7)
+fit <- train(diabetes~., data=PimaIndiansDiabetes, method="glm", metric="ROC", trControl=control)
+# display results
+print(fit)
+
+```
+
+
+
+
+#### Some Useful Terms
+#### true positives (TP):These are cases in which we predicted yes (they have the disease), and they do have the disease.
+#### true negatives (TN):We predicted no, and they don't have the disease.
+#### false positives (FP):We predicted yes, but they don't actually have the disease. (Also known as a "Type I error.")
+#### false negatives (FN):We predicted no, but they actually do have the disease. (Also known as a "Type II error.")
+
+#### Type I error
+#### When you REJECT the null hypothesis when the null hypothesis is TRUE
+
+#### Type II error
+#### When you FAIL to reject when the null hypothesis is FALSE
+
+
+#### Sensitivity vs specificity
+
+#### Sensitivity and specificity are statistical measures of the performance of abinary classification test, also known in statistics as classification function:
+#### Sensitivity (also called the true positive rate, the recall, or probability of detection in some fields) measures the proportion of positives that are correctly identified as such (e.g. the percentage of sick people who are correctly identified as having the condition).
+#### Specificity (also called thetrue negative rate) measures the proportion of negatives that are correctly identified as such (e.g. the percentage of healthy people who are correctly identified as not having the condition).
